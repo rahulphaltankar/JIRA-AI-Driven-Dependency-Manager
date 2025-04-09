@@ -522,63 +522,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const modelConfig = req.body;
       
-      // Create a model record
-      const [model] = await db.insert(mlModels)
-        .values({
-          name: modelConfig.name,
-          description: modelConfig.description || '',
-          modelType: modelConfig.modelType,
-          parameters: modelConfig.parameters,
-          trainingStatus: 'training',
-          userId: 1 // Default to first user for now
-        })
-        .returning();
-      
-      // Start training in the background
-      juliaBridge.trainModel(model.id, modelConfig)
-        .then((result) => {
-          // Update model status and notify clients when done
-          db.update(mlModels)
-            .set({ 
-              trainingStatus: result.success ? 'completed' : 'failed',
-              accuracy: result.accuracy
-            })
-            .where(eq(mlModels.id, model.id))
-            .then((result) => {
-              // Assuming result has a returned item in an array
-              const updatedModel = Array.isArray(result) && result.length > 0 ? result[0] : null;
-              // Use the model ID and training result data rather than depending on the DB query result
-              broadcast('modelTrainingUpdate', { 
-                modelId: model.id, 
-                status: updatedModel?.trainingStatus || 'unknown',
-                accuracy: updatedModel?.accuracy || null
-              });
-            })
-            .catch(err => console.error('Error updating model status:', err));
-        })
-        .catch(err => {
-          console.error('Error training model:', err);
-          
-          // Update model status to failed
-          db.update(mlModels)
-            .set({ trainingStatus: 'failed' })
-            .where(eq(mlModels.id, model.id))
-            .catch(updateErr => console.error('Error updating model status:', updateErr));
-            
-          broadcast('modelTrainingUpdate', { 
-            modelId: model.id, 
-            status: 'failed'
-          });
+      // Validate input
+      if (!modelConfig.name || !modelConfig.modelType) {
+        return res.status(400).json({ 
+          message: 'Invalid model configuration. Name and modelType are required.' 
         });
+      }
       
-      res.status(202).json({ 
-        success: true, 
-        message: 'Model training started',
-        modelId: model.id
-      });
-    } catch (error) {
+      try {
+        // Create a model record
+        const [model] = await db.insert(mlModels)
+          .values({
+            name: modelConfig.name,
+            description: modelConfig.description || '',
+            modelType: modelConfig.modelType,
+            parameters: modelConfig.parameters || {},
+            trainingStatus: 'training',
+            userId: 1 // Default to first user for now
+          })
+          .returning();
+        
+        // Start training in the background
+        juliaBridge.trainModel(model.id, modelConfig)
+          .then((result) => {
+            // Update model status and notify clients when done
+            db.update(mlModels)
+              .set({ 
+                trainingStatus: result.success ? 'completed' : 'failed',
+                accuracy: result.accuracy
+              })
+              .where(eq(mlModels.id, model.id))
+              .then((result) => {
+                // Assuming result has a returned item in an array
+                const updatedModel = Array.isArray(result) && result.length > 0 ? result[0] : null;
+                // Use the model ID and training result data rather than depending on the DB query result
+                broadcast('modelTrainingUpdate', { 
+                  modelId: model.id, 
+                  status: updatedModel?.trainingStatus || 'unknown',
+                  accuracy: updatedModel?.accuracy || null
+                });
+              })
+              .catch(err => console.error('Error updating model status:', err));
+          })
+          .catch(err => {
+            console.error('Error training model:', err);
+            
+            // Update model status to failed
+            db.update(mlModels)
+              .set({ trainingStatus: 'failed' })
+              .where(eq(mlModels.id, model.id))
+              .catch(updateErr => console.error('Error updating model status:', updateErr));
+              
+            broadcast('modelTrainingUpdate', { 
+              modelId: model.id, 
+              status: 'failed'
+            });
+          });
+        
+        return res.status(202).json({ 
+          success: true, 
+          message: 'Model training started',
+          modelId: model.id
+        });
+      } catch (dbError: any) {
+        // Handle specific database errors
+        if (dbError.code === '23503') { // Foreign key constraint violation
+          console.error('Database constraint error:', dbError.detail);
+          return res.status(500).json({ 
+            message: 'Database error: Required reference not found. Please try again later.' 
+          });
+        }
+        // Re-throw for outer catch block
+        throw dbError;
+      }
+    } catch (error: any) {
       console.error('Error starting model training:', error);
-      res.status(500).json({ message: 'Error starting model training' });
+      const errorMessage = error.message || 'Error starting model training';
+      return res.status(500).json({ 
+        message: `Error starting model training: ${errorMessage}`
+      });
     }
   });
 
