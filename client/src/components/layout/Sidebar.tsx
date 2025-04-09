@@ -8,15 +8,15 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { path: "/", icon: "dashboard", label: "Dashboard" },
-  { path: "/dependencies", icon: "network_check", label: "Dependencies" },
-  { path: "/analysis", icon: "analytics", label: "Analysis" },
-  { path: "/optimization", icon: "precision_manufacturing", label: "Optimization" },
+  { path: "/dependencies", icon: "device_hub", label: "Dependencies" },
+  { path: "/analysis", icon: "analytics", label: "Analytics" },
+  { path: "/optimization", icon: "auto_graph", label: "Optimization" },
 ];
 
 const configNavItems: NavItem[] = [
   { path: "/settings", icon: "settings", label: "Settings" },
-  { path: "/integrations", icon: "link", label: "Integrations" },
-  { path: "/ml-config", icon: "science", label: "ML Configuration" },
+  { path: "/integrations", icon: "integration_instructions", label: "Integrations" },
+  { path: "/ml-config", icon: "model_training", label: "ML Configuration" },
 ];
 
 interface SidebarProps {
@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center">
           <span className="material-icons text-primary-foreground mr-3">device_hub</span>
-          <span className="font-semibold text-lg tracking-wide">JIRA-PINN</span>
+          <span className="font-semibold text-lg tracking-wide">Jira-Pinn</span>
         </div>
         <button 
           className="md:hidden focus:outline-none text-white/80 hover:text-white"

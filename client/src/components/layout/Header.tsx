@@ -27,8 +27,8 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
           <div className="relative hidden sm:block">
             <input 
               type="text" 
-              placeholder="Search dependencies..." 
-              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 shadow-sm"
+              placeholder="Search..." 
+              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm w-56 transition-all duration-200 hover:border-gray-300"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
