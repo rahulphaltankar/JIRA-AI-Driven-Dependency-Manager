@@ -45,10 +45,10 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
       
     svgRef.current = svg.node();
     
-    // Color scale for nodes
+    // Color scale for nodes - updated to match our theme
     const color = d3.scaleOrdinal<string>()
       .domain(["team", "epic-completed", "epic-in-progress", "epic-at-risk", "epic-blocked"])
-      .range(["#1976d2", "#4caf50", "#2196f3", "#ff9800", "#f44336"]);
+      .range(["hsl(215, 85%, 45%)", "#10b981", "hsl(215, 85%, 65%)", "#f59e0b", "#ef4444"]);
       
     // Create force simulation
     const simulation = d3.forceSimulation(data.nodes)
@@ -151,36 +151,43 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
   }, [data, onNodeClick]);
   
   return (
-    <div className={`bg-white rounded-lg shadow ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-lg font-medium">Dependency Network</h2>
+    <div className={`bg-white rounded-lg shadow-md border border-gray-100 ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
+      <div className="p-5 border-b border-gray-200 flex justify-between items-center">
+        <h2 className="text-lg font-bold text-gray-800 flex items-center">
+          <span className="material-icons text-primary mr-2">device_hub</span>
+          Dependency Network
+        </h2>
         <div className="flex space-x-2">
           <button 
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="text-primary/70 hover:text-primary focus:outline-none transition-colors bg-gray-50 p-2 rounded-full"
             onClick={() => setIsFullscreen(!isFullscreen)}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             <span className="material-icons">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
           </button>
-          <button className="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <button 
+            className="text-primary/70 hover:text-primary focus:outline-none transition-colors bg-gray-50 p-2 rounded-full"
+            aria-label="More options"
+          >
             <span className="material-icons">more_vert</span>
           </button>
         </div>
       </div>
-      <div className="p-4">
-        <div className="flex flex-wrap gap-2 mb-4">
+      <div className="p-5">
+        <div className="flex flex-wrap gap-3 mb-5">
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button 
-              className={`px-4 py-2 text-sm font-medium ${viewType === 'art' 
-                ? 'text-white bg-primary border border-primary' 
-                : 'text-gray-700 bg-white border border-gray-200'} rounded-l-lg hover:bg-gray-100 focus:outline-none`}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${viewType === 'art' 
+                ? 'text-white bg-primary border border-primary shadow-md' 
+                : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'} rounded-l-lg focus:outline-none focus:ring-1 focus:ring-primary/30`}
               onClick={() => setViewType('art')}
             >
               ART View
             </button>
             <button 
-              className={`px-4 py-2 text-sm font-medium ${viewType === 'team' 
-                ? 'text-white bg-primary border border-primary' 
-                : 'text-gray-700 bg-white border border-gray-200'} rounded-r-lg focus:outline-none`}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${viewType === 'team' 
+                ? 'text-white bg-primary border border-primary shadow-md' 
+                : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'} rounded-r-lg focus:outline-none focus:ring-1 focus:ring-primary/30`}
               onClick={() => setViewType('team')}
             >
               Team View
@@ -188,9 +195,10 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
           </div>
           
           <select 
-            className="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+            className="bg-white border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary shadow-sm"
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
+            aria-label="Select time period"
           >
             <option>Current PI</option>
             <option>PI 2023.1</option>
@@ -198,9 +206,10 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
           </select>
           
           <select 
-            className="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+            className="bg-white border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary shadow-sm"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
+            aria-label="Filter dependencies"
           >
             <option>All Dependencies</option>
             <option>At Risk Only</option>
@@ -211,29 +220,30 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
         {/* Network Visualization */}
         <div 
           ref={containerRef}
-          className={`border border-gray-200 rounded-md bg-gray-50 ${isFullscreen ? 'h-[calc(100vh-200px)]' : 'h-96'}`}
+          className={`border border-gray-200 rounded-lg bg-gray-50 ${isFullscreen ? 'h-[calc(100vh-220px)]' : 'h-[420px]'} shadow-inner`}
+          aria-label="Dependency network visualization"
         />
         
-        <div className="mt-4 flex flex-wrap gap-4">
+        <div className="mt-5 flex flex-wrap gap-5 bg-gray-50 p-3 rounded-md border border-gray-100">
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-            <span className="text-sm text-gray-600">Team</span>
+            <div className="w-4 h-4 rounded-full bg-primary mr-2 shadow-sm"></div>
+            <span className="text-sm font-medium text-gray-700">Team</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-            <span className="text-sm text-gray-600">Completed</span>
+            <div className="w-4 h-4 rounded-full bg-emerald-500 mr-2 shadow-sm"></div>
+            <span className="text-sm font-medium text-gray-700">Completed</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
-            <span className="text-sm text-gray-600">In Progress</span>
+            <div className="w-4 h-4 rounded-full bg-primary/70 mr-2 shadow-sm"></div>
+            <span className="text-sm font-medium text-gray-700">In Progress</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-orange-500 mr-2"></div>
-            <span className="text-sm text-gray-600">At Risk</span>
+            <div className="w-4 h-4 rounded-full bg-amber-500 mr-2 shadow-sm"></div>
+            <span className="text-sm font-medium text-gray-700">At Risk</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-            <span className="text-sm text-gray-600">Blocked</span>
+            <div className="w-4 h-4 rounded-full bg-red-500 mr-2 shadow-sm"></div>
+            <span className="text-sm font-medium text-gray-700">Blocked</span>
           </div>
         </div>
       </div>
