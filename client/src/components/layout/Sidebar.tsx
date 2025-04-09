@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     >
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center">
-          <span className="material-icons text-primary-foreground mr-3">device_hub</span>
+          <i className="material-icons text-primary-foreground mr-3">device_hub</i>
           <span className="font-semibold text-lg tracking-wide">JIRA-PINN</span>
         </div>
         <button 
@@ -42,7 +42,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           onClick={onClose}
           aria-label="Close menu"
         >
-          <span className="material-icons">close</span>
+          <i className="material-icons">close</i>
         </button>
       </div>
       
@@ -54,7 +54,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             key={item.path}
             className={`flex items-center py-3 px-5 text-white/90 hover:bg-white/10 transition-colors duration-150 ${location === item.path ? 'bg-white/20 text-white border-l-4 border-white' : ''}`}
           >
-            <span className="material-icons mr-3 text-[20px]">{item.icon}</span>
+            <i className="material-icons mr-3 text-[20px]">{item.icon}</i>
             <span className="font-medium">{item.label}</span>
           </Link>
         ))}
@@ -66,7 +66,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             key={item.path}
             className={`flex items-center py-3 px-5 text-white/90 hover:bg-white/10 transition-colors duration-150 ${location === item.path ? 'bg-white/20 text-white border-l-4 border-white' : ''}`}
           >
-            <span className="material-icons mr-3 text-[20px]">{item.icon}</span>
+            <i className="material-icons mr-3 text-[20px]">{item.icon}</i>
             <span className="font-medium">{item.label}</span>
           </Link>
         ))}
@@ -74,7 +74,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="mt-auto p-5 border-t border-white/10">
           <div className="flex items-center">
             <div className="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center text-white">
-              <span className="material-icons text-base">person</span>
+              <i className="material-icons text-base">person</i>
             </div>
             <div className="ml-3">
               <div className="text-sm font-medium text-white">John Smith</div>
