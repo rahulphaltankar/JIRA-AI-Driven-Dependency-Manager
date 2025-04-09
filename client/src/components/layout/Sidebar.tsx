@@ -1,5 +1,24 @@
 import { Link, useLocation } from "wouter";
-import { mainNavItems, configNavItems } from "@/lib/sidebar-config-updated";
+
+interface NavItem {
+  path: string;
+  icon: string;
+  label: string;
+}
+
+const mainNavItems: NavItem[] = [
+  { path: "/", icon: "dashboard", label: "Dashboard" },
+  { path: "/dependencies", icon: "device_hub", label: "Dependencies" },
+  { path: "/analysis", icon: "analytics", label: "Analytics" },
+  { path: "/optimization", icon: "auto_graph", label: "Optimization" },
+  { path: "/user-guide", icon: "help_outline", label: "User Guide" },
+];
+
+const configNavItems: NavItem[] = [
+  { path: "/settings", icon: "settings", label: "Settings" },
+  { path: "/integrations", icon: "integration_instructions", label: "Integrations" },
+  { path: "/ml-config", icon: "model_training", label: "ML Configuration" },
+];
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +40,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <button 
           className="md:hidden focus:outline-none text-white/80 hover:text-white"
           onClick={onClose}
+          aria-label="Close menu"
         >
           <span className="material-icons">close</span>
         </button>

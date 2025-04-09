@@ -76,6 +76,18 @@ export default function UserGuide() {
                   >
                     ML Configuration
                   </button>
+                  <button 
+                    onClick={() => scrollToSection("faq")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "faq" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    FAQs
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection("support")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "support" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    Getting Support
+                  </button>
                 </div>
                 
                 {/* Guide content */}
