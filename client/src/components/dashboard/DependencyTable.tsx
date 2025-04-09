@@ -142,13 +142,13 @@ export default function DependencyTable({
                 </td>
                 <td className="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button 
-                    className="text-primary hover:text-primary-dark mr-3"
+                    className="text-primary hover:text-primary-dark mr-3 font-medium"
                     onClick={() => onViewDependency(dependency.id)}
                   >
-                    View
+                    View Details
                   </button>
                   <button 
-                    className="text-primary hover:text-primary-dark"
+                    className="text-primary hover:text-primary-dark font-medium"
                     onClick={() => onOptimizeDependency(dependency.id)}
                   >
                     Optimize

@@ -1,23 +1,5 @@
 import { Link, useLocation } from "wouter";
-
-interface NavItem {
-  path: string;
-  icon: string;
-  label: string;
-}
-
-const mainNavItems: NavItem[] = [
-  { path: "/", icon: "dashboard", label: "Dashboard" },
-  { path: "/dependencies", icon: "device_hub", label: "Dependencies" },
-  { path: "/analysis", icon: "analytics", label: "Analytics" },
-  { path: "/optimization", icon: "auto_graph", label: "Optimization" },
-];
-
-const configNavItems: NavItem[] = [
-  { path: "/settings", icon: "settings", label: "Settings" },
-  { path: "/integrations", icon: "integration_instructions", label: "Integrations" },
-  { path: "/ml-config", icon: "model_training", label: "ML Configuration" },
-];
+import { mainNavItems, configNavItems } from "@/lib/sidebar-config";
 
 interface SidebarProps {
   isOpen: boolean;
