@@ -5,7 +5,7 @@ export interface NavItem {
   label: string;
 }
 
-// Main navigation items with correct material icon names matching the screenshot
+// Main navigation items with exact material icon names matching the screenshot
 export const mainNavItems: NavItem[] = [
   { path: "/", icon: "dashboard", label: "Dashboard" },
   { path: "/dependencies", icon: "device_hub", label: "Dependencies" },

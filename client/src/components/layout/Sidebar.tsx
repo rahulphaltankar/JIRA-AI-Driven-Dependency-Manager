@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { mainNavItems, configNavItems } from "@/lib/sidebar-config";
+import { mainNavItems, configNavItems } from "@/lib/sidebar-config-updated";
 
 interface SidebarProps {
   isOpen: boolean;
