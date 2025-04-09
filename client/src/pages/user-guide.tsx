@@ -42,6 +42,12 @@ export default function UserGuide() {
                     Overview
                   </button>
                   <button 
+                    onClick={() => scrollToSection("daily-workflow")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "daily-workflow" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    Daily User Workflow
+                  </button>
+                  <button 
                     onClick={() => scrollToSection("dashboard")}
                     className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "dashboard" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
                   >
@@ -118,6 +124,82 @@ export default function UserGuide() {
                       This tool is designed to help Agile teams, Release Train Engineers, and Product Managers 
                       to identify, manage, and optimize dependencies across their organization.
                     </p>
+                  </section>
+                  
+                  <section id="daily-workflow" className="scroll-mt-20">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">Daily User Workflow</h2>
+                    <div className="bg-blue-50 p-4 rounded-md border border-blue-200 mb-4">
+                      <h3 className="font-medium text-blue-800 mb-2">Typical Daily Usage Sequence</h3>
+                      <ol className="list-decimal pl-6 space-y-2 text-blue-900">
+                        <li><strong>Start with the Dashboard</strong> - Review metrics and get an overview of current dependencies</li>
+                        <li><strong>Check Critical Dependencies</strong> - Address high-risk items that need immediate attention</li>
+                        <li><strong>Apply Recommendations</strong> - Review and implement AI suggestions to optimize dependencies</li>
+                        <li><strong>View Dependency Analysis</strong> - Analyze detailed risk factors for critical items</li>
+                        <li><strong>Update Dependencies</strong> - Update status and information on managed dependencies</li>
+                      </ol>
+                    </div>
+                    
+                    <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">Weekly Administrative Tasks:</h3>
+                    <ol className="list-decimal pl-6 space-y-1 mb-3">
+                      <li>
+                        <strong>Import Dependencies</strong> - Connect to Jira/Jira Align and sync the latest dependency data
+                        <p className="text-sm text-gray-600 mt-1">Navigate to: <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">Integrations → Sync Dependencies</span></p>
+                      </li>
+                      <li>
+                        <strong>Train ML Models</strong> - Update the ML models with the latest data for better predictions
+                        <p className="text-sm text-gray-600 mt-1">Navigate to: <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">ML Configuration → Train Model</span></p>
+                      </li>
+                      <li>
+                        <strong>Generate Optimization Scenarios</strong> - Create new optimization plans based on current data
+                        <p className="text-sm text-gray-600 mt-1">Navigate to: <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">Optimization → Generate Scenarios</span></p>
+                      </li>
+                      <li>
+                        <strong>Review Analysis Reports</strong> - Check trend analysis and network metrics
+                        <p className="text-sm text-gray-600 mt-1">Navigate to: <span className="font-mono bg-gray-100 px-1 py-0.5 rounded">Analysis → Report View</span></p>
+                      </li>
+                    </ol>
+                    
+                    <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">Role-Specific Workflows:</h3>
+                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+                      <div className="border rounded-md p-3">
+                        <h4 className="font-medium text-gray-800 mb-2">Release Train Engineers (RTEs):</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          <li>Focus on Cross-ART dependencies</li>
+                          <li>Use Optimization page to balance dependencies</li>
+                          <li>Review ML-generated risk analyses</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-md p-3">
+                        <h4 className="font-medium text-gray-800 mb-2">Team Leads:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          <li>Manage team-specific dependencies</li>
+                          <li>Track critical dependencies daily</li>
+                          <li>Apply recommended optimizations</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-md p-3">
+                        <h4 className="font-medium text-gray-800 mb-2">Product Managers:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          <li>Monitor dashboard for bottlenecks</li>
+                          <li>Use Analytics to identify dependency patterns</li>
+                          <li>Track dependency impact on product timelines</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-md p-3">
+                        <h4 className="font-medium text-gray-800 mb-2">Architects:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          <li>Focus on technical dependencies</li>
+                          <li>Use Network Visualization for system view</li>
+                          <li>Apply optimization scenarios</li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-50 p-3 rounded-md border border-green-200 mt-4">
+                      <p className="text-sm text-green-800">
+                        <strong>Best Practice:</strong> Schedule 15 minutes each morning to review the Dashboard and address any critical dependencies or apply recommended optimizations.
+                      </p>
+                    </div>
                   </section>
                   
                   <section id="dashboard" className="scroll-mt-20">

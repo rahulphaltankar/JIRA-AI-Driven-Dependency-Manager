@@ -546,10 +546,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         juliaBridge.trainModel(model.id, modelConfig)
           .then((result) => {
             // Update model status and notify clients when done
+            // Convert accuracy to integer percentage (0-100) for database storage
+            const accuracyValue = result.accuracy 
+              ? Math.round(result.accuracy * 100) 
+              : null;
+              
             db.update(mlModels)
               .set({ 
                 trainingStatus: result.success ? 'completed' : 'failed',
-                accuracy: result.accuracy
+                accuracy: accuracyValue
               })
               .where(eq(mlModels.id, model.id))
               .then((result) => {
