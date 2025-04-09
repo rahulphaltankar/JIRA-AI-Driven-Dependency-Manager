@@ -15,6 +15,7 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
           <button 
             className="md:hidden mr-3 text-primary hover:text-primary/80 focus:outline-none transition-colors"
             onClick={onMenuClick}
+            aria-label="Open menu"
           >
             <span className="material-icons">menu</span>
           </button>
@@ -31,17 +32,24 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm w-56 transition-all duration-200 hover:border-gray-300"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              aria-label="Search"
             />
             <div className="absolute left-3 top-2.5 text-primary/60">
               <span className="material-icons text-sm">search</span>
             </div>
           </div>
           
-          <button className="text-primary/70 hover:text-primary focus:outline-none transition-colors bg-gray-50 p-2 rounded-full">
+          <button 
+            className="text-primary/70 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors bg-gray-50 p-2 rounded-full"
+            aria-label="Notifications"
+          >
             <span className="material-icons">notifications</span>
           </button>
           
-          <button className="text-primary/70 hover:text-primary focus:outline-none transition-colors bg-gray-50 p-2 rounded-full">
+          <button 
+            className="text-primary/70 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors bg-gray-50 p-2 rounded-full"
+            aria-label="Help"
+          >
             <span className="material-icons">help_outline</span>
           </button>
         </div>

@@ -58,7 +58,7 @@ export default function StatusCard({
           <h3 className="text-2xl font-bold mt-1">{value}</h3>
         </div>
         <div className={cn(statusCardIconVariants({ type }), "rounded-full p-3")}>
-          <span className="material-icons">{icon}</span>
+          <span className="material-icons text-xl">{icon}</span>
         </div>
       </div>
       <div className="mt-3 text-sm">

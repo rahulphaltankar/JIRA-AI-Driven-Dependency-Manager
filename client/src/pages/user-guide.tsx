@@ -270,33 +270,91 @@ export default function UserGuide() {
                   <section id="ml-config" className="scroll-mt-20">
                     <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">ML Configuration</h2>
                     <p className="mb-3">
-                      The ML Configuration page allows you to customize the machine learning models used for 
-                      dependency analysis and optimization.
+                      The ML Configuration page allows you to customize the machine learning models used for dependency analysis and optimization.
                     </p>
                     <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">Key Features:</h3>
                     <ul className="list-disc pl-6 space-y-1 mb-3">
                       <li>
-                        <strong>Model Selection</strong>: Choose from different model types including Universal Differential 
-                        Equations (UDEs) and Physics-Informed Neural Networks (PINNs).
+                        <strong>Model Selection</strong>: Choose between different machine learning models, including UDEs (Universal Differential Equations), PINNs (Physics-Informed Neural Networks), and traditional ML approaches.
                       </li>
                       <li>
-                        <strong>Parameter Configuration</strong>: Adjust model parameters to fit your organization's 
-                        specific needs.
+                        <strong>Parameter Tuning</strong>: Adjust model hyperparameters to optimize performance for your specific dependency network.
                       </li>
                       <li>
-                        <strong>Model Training</strong>: Train models on your historical dependency data for more 
-                        accurate predictions.
+                        <strong>Model Training</strong>: Train models on your dependency data to improve accuracy and recommendations.
                       </li>
                       <li>
-                        <strong>Model Evaluation</strong>: View model performance metrics and accuracy statistics.
+                        <strong>Model Evaluation</strong>: View model performance metrics and compare different model configurations.
+                      </li>
+                      <li>
+                        <strong>Advanced Settings</strong>: Configure advanced parameters for scientific machine learning algorithms.
                       </li>
                     </ul>
                     <div className="bg-purple-50 p-3 rounded-md border border-purple-200">
                       <p className="text-sm text-purple-800">
-                        <strong>Advanced Users:</strong> Advanced users can create custom model configurations for 
-                        highly specialized dependency analysis.
+                        <strong>Advanced User Tip:</strong> For optimal results, use UDEs for complex dependency networks with time-dependent behaviors, and PINNs for networks with known physical or organizational constraints.
                       </p>
                     </div>
+                  </section>
+                  
+                  <section id="faq" className="scroll-mt-20">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">Frequently Asked Questions</h2>
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium text-gray-900">What is JIRA-PINN?</h3>
+                        <p className="text-gray-600">
+                          JIRA-PINN is a dependency optimization tool that uses Scientific Machine Learning and Physics-Informed Neural Networks to help teams manage and optimize dependencies in Jira and Jira Align.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">How does JIRA-PINN calculate risk scores?</h3>
+                        <p className="text-gray-600">
+                          Risk scores are calculated using a combination of factors including dependency complexity, team capacity, historical performance, and due date proximity. The exact calculation is performed by the UDE models that combine physical constraints with neural network insights.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">Can I use JIRA-PINN without Jira Align?</h3>
+                        <p className="text-gray-600">
+                          Yes, JIRA-PINN works with standard Jira for dependency management. Jira Align integration provides additional features for cross-ART dependencies and portfolio-level insights.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">How often should I run optimization?</h3>
+                        <p className="text-gray-600">
+                          We recommend running optimization at least once per sprint or whenever significant changes occur in your dependency network.
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">Does JIRA-PINN automatically apply recommendations?</h3>
+                        <p className="text-gray-600">
+                          No, all recommendations must be reviewed and approved by users before they are applied. JIRA-PINN provides the insights, but humans make the final decisions.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                  
+                  <section id="support" className="scroll-mt-20">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">Getting Support</h2>
+                    <p className="mb-3">
+                      If you need additional help or have questions about JIRA-PINN, there are several support options available:
+                    </p>
+                    <ul className="list-disc pl-6 space-y-1 mb-3">
+                      <li>
+                        <strong>In-App Help</strong>: Click the Help icon in the top-right corner of any page for contextual help.
+                      </li>
+                      <li>
+                        <strong>Documentation</strong>: Visit our comprehensive documentation portal for detailed guides and tutorials.
+                      </li>
+                      <li>
+                        <strong>Support Tickets</strong>: Submit a support ticket through the Settings page for technical issues.
+                      </li>
+                      <li>
+                        <strong>Training</strong>: Request a training session for your team to get the most out of JIRA-PINN.
+                      </li>
+                    </ul>
+                    <p className="text-gray-600">
+                      For urgent issues, please contact our support team at support@jira-pinn.com or call our support hotline at +1-888-JIRA-PINN.
+                    </p>
                   </section>
                 </div>
               </div>
