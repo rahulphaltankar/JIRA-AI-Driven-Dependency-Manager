@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center">
           <span className="material-icons text-primary-foreground mr-3">device_hub</span>
-          <span className="font-semibold text-lg tracking-wide">Jira-Pinn</span>
+          <span className="font-semibold text-lg tracking-wide">JIRA-PINN</span>
         </div>
         <button 
           className="md:hidden focus:outline-none text-white/80 hover:text-white"
