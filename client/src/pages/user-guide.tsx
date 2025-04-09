@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
+import FeaturesRoadmap from "@/components/roadmap/FeaturesRoadmap";
 
 export default function UserGuide() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -75,6 +76,12 @@ export default function UserGuide() {
                     className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "ml-config" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
                   >
                     ML Configuration
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection("roadmap")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "roadmap" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    Feature Roadmap
                   </button>
                   <button 
                     onClick={() => scrollToSection("faq")}
@@ -305,6 +312,21 @@ export default function UserGuide() {
                     <div className="bg-purple-50 p-3 rounded-md border border-purple-200">
                       <p className="text-sm text-purple-800">
                         <strong>Advanced User Tip:</strong> For optimal results, use UDEs for complex dependency networks with time-dependent behaviors, and PINNs for networks with known physical or organizational constraints.
+                      </p>
+                    </div>
+                  </section>
+                  
+                  <section id="roadmap" className="scroll-mt-20">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">Feature Roadmap</h2>
+                    <p className="mb-3">
+                      JIRA-PINN is constantly evolving to provide more features and capabilities. Below is a preview of upcoming features planned for future releases.
+                    </p>
+                    <div className="mt-6">
+                      <FeaturesRoadmap />
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded-md border border-blue-200 mt-6">
+                      <p className="text-sm text-blue-800">
+                        <strong>Stay Updated:</strong> Our development team regularly adds new features based on user feedback. Check back often to see what's new!
                       </p>
                     </div>
                   </section>
