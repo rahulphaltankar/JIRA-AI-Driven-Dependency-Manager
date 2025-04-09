@@ -169,7 +169,7 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title="Dependency Optimizer Dashboard" onMenuClick={() => setSidebarOpen(true)} />
         
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-background mt-16">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-background mt-16 md:ml-0">
           {/* Status Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <StatusCard 

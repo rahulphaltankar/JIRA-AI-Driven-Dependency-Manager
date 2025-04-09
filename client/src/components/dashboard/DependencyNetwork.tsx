@@ -13,7 +13,18 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
   const [filterType, setFilterType] = useState('All Dependencies');
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  useEffect(() => {
+    if (!containerRef.current || !data.nodes.length) return;
+    
+    const container = containerRef.current;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    // Redraw graph when fullscreen changes
+  }, [isFullscreen, data, onNodeClick]);
+  
   useEffect(() => {
     if (!containerRef.current || !data.nodes.length) return;
     
@@ -140,12 +151,15 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
   }, [data, onNodeClick]);
   
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className={`bg-white rounded-lg shadow ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-lg font-medium">Dependency Network</h2>
         <div className="flex space-x-2">
-          <button className="text-gray-500 hover:text-gray-700 focus:outline-none">
-            <span className="material-icons">fullscreen</span>
+          <button 
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+          >
+            <span className="material-icons">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
           </button>
           <button className="text-gray-500 hover:text-gray-700 focus:outline-none">
             <span className="material-icons">more_vert</span>
@@ -157,7 +171,7 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button 
               className={`px-4 py-2 text-sm font-medium ${viewType === 'art' 
-                ? 'text-primary bg-white border border-gray-200' 
+                ? 'text-white bg-primary border border-primary' 
                 : 'text-gray-700 bg-white border border-gray-200'} rounded-l-lg hover:bg-gray-100 focus:outline-none`}
               onClick={() => setViewType('art')}
             >
@@ -197,28 +211,28 @@ export default function DependencyNetwork({ data, onNodeClick }: DependencyNetwo
         {/* Network Visualization */}
         <div 
           ref={containerRef}
-          className="h-96 border border-gray-200 rounded-md bg-gray-50"
+          className={`border border-gray-200 rounded-md bg-gray-50 ${isFullscreen ? 'h-[calc(100vh-200px)]' : 'h-96'}`}
         />
         
         <div className="mt-4 flex flex-wrap gap-4">
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-primary mr-2"></div>
+            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
             <span className="text-sm text-gray-600">Team</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-secondary mr-2"></div>
-            <span className="text-sm text-gray-600">Epic</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-success mr-2"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
             <span className="text-sm text-gray-600">Completed</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-warning mr-2"></div>
+            <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
+            <span className="text-sm text-gray-600">In Progress</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-orange-500 mr-2"></div>
             <span className="text-sm text-gray-600">At Risk</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-error mr-2"></div>
+            <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
             <span className="text-sm text-gray-600">Blocked</span>
           </div>
         </div>

@@ -9,7 +9,7 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm fixed w-full z-10">
+    <header className="bg-white border-b border-gray-200 shadow-sm fixed w-full z-20">
       <div className="px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
         <div className="flex items-center">
           <button 
@@ -22,7 +22,7 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
         </div>
         
         <div className="flex items-center space-x-4">
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <input 
               type="text" 
               placeholder="Search..." 

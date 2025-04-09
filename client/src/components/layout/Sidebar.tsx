@@ -29,7 +29,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside 
-      className={`bg-primary-dark text-white w-64 flex-shrink-0 h-screen fixed z-20 transition-all duration-300 transform md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+      className={`bg-primary-dark text-white w-64 flex-shrink-0 h-screen fixed z-30 transition-all duration-300 transform md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
     >
       <div className="p-4 border-b border-primary flex items-center justify-between">
         <div className="flex items-center">
@@ -44,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </button>
       </div>
       
-      <nav className="pt-4 flex flex-col h-[calc(100%-64px)]">
+      <nav className="pt-4 flex flex-col h-[calc(100%-64px)] overflow-y-auto">
         <div className="px-4 mb-3 text-sm text-gray-300 uppercase tracking-wider">Main</div>
         {mainNavItems.map((item) => (
           <Link 
