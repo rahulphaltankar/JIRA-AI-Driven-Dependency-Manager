@@ -18,6 +18,7 @@ const configNavItems: NavItem[] = [
   { path: "/settings", icon: "settings", label: "Settings" },
   { path: "/integrations", icon: "integration_instructions", label: "Integrations" },
   { path: "/ml-config", icon: "model_training", label: "ML Configuration" },
+  { path: "/pinn-config", icon: "science", label: "PINN Configuration" },
 ];
 
 interface SidebarProps {

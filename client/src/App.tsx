@@ -6,6 +6,7 @@ import Optimization from "@/pages/optimization";
 import Settings from "@/pages/settings";
 import Integrations from "@/pages/integrations";
 import MlConfig from "@/pages/ml-config";
+import PinnConfig from "@/pages/pinn-config";
 import UserGuide from "@/pages/user-guide";
 import NotFound from "@/pages/not-found";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,6 +22,7 @@ function App() {
         <Route path="/settings" component={Settings} />
         <Route path="/integrations" component={Integrations} />
         <Route path="/ml-config" component={MlConfig} />
+        <Route path="/pinn-config" component={PinnConfig} />
         <Route path="/user-guide" component={UserGuide} />
         <Route component={NotFound} />
       </Switch>
