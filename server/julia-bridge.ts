@@ -920,7 +920,7 @@ class JuliaBridge {
     // Generate synthetic time points
     const timeRange = model.timeRange || [0, 10];
     const stepSize = model.stepSize || 0.1;
-    const timePoints = [];
+    const timePoints: number[] = [];
     for (let t = timeRange[0]; t <= timeRange[1]; t += stepSize) {
       timePoints.push(t);
     }

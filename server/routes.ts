@@ -11,10 +11,12 @@ import {
   jiraConfigs, 
   optimizationRecommendations, 
   mlModels,
+  pinnModels,
   insertDependencySchema,
   insertOptimizationRecommendationSchema,
   insertMlModelSchema,
-  insertJiraConfigSchema
+  insertJiraConfigSchema,
+  insertPinnModelSchema
 } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -91,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const blockedDependencies = allDependencies.filter(d => d.status === 'blocked').length;
       
       // Calculate optimization score based on risk scores and status
-      const avgRiskScore = allDependencies.reduce((sum, dep) => sum + dep.riskScore, 0) / Math.max(1, allDependencies.length);
+      const avgRiskScore = allDependencies.reduce((sum, dep) => sum + (dep.riskScore || 0), 0) / Math.max(1, allDependencies.length);
       const optimizationScore = Math.max(0, 100 - avgRiskScore);
       
       res.json({
@@ -605,6 +607,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const errorMessage = error.message || 'Error starting model training';
       return res.status(500).json({ 
         message: `Error starting model training: ${errorMessage}`
+      });
+    }
+  });
+
+  // PINN (Physics Informed Neural Network) routes
+  app.get('/api/pinn/config', async (req, res) => {
+    try {
+      const config = await juliaBridge.getPinnConfig();
+      res.json(config);
+    } catch (error) {
+      console.error('Error fetching PINN configuration:', error);
+      res.status(500).json({ message: 'Error fetching PINN configuration' });
+    }
+  });
+
+  app.get('/api/pinn/models', async (req, res) => {
+    try {
+      const models = await db.select().from(pinnModels);
+      res.json(models);
+    } catch (error) {
+      console.error('Error fetching PINN models:', error);
+      res.status(500).json({ message: 'Error fetching PINN models' });
+    }
+  });
+
+  app.post('/api/pinn/train', async (req, res) => {
+    try {
+      const modelConfig = req.body;
+      
+      // Validate model config
+      if (!modelConfig.name || !modelConfig.equationType) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid model configuration: name and equationType are required' 
+        });
+      }
+      
+      try {
+        // Create model record in database
+        const [model] = await db.insert(pinnModels)
+          .values({
+            name: modelConfig.name,
+            description: modelConfig.description || '',
+            equation: modelConfig.equationFormula || 'du/dt = f(u,t)',
+            equationType: modelConfig.equationType,
+            parameters: modelConfig.parameters || {},
+            boundaryConditions: modelConfig.boundaryConditions || {},
+            initialConditions: modelConfig.initialConditions || {},
+            physicsLossWeight: modelConfig.physicsLossWeight || 0.5,
+            dataLossWeight: modelConfig.dataLossWeight || 0.3,
+            boundaryLossWeight: modelConfig.boundaryLossWeight || 0.2,
+            trainingStatus: 'training',
+            userId: 1 // Default to first user for now
+          })
+          .returning();
+        
+        // Train in the background
+        Promise.resolve().then(async () => {
+          try {
+            // Start the training process
+            broadcast('modelTrainingUpdate', { 
+              modelId: model.id, 
+              status: 'training',
+              type: 'pinn'
+            });
+            
+            const result = await juliaBridge.trainPinnModel(model);
+            
+            // Update the model record with training results
+            if (result.success) {
+              const accuracyValue = result.accuracy ? parseFloat(result.accuracy.toFixed(4)) : null;
+              
+              db.update(pinnModels)
+                .set({ 
+                  trainingStatus: 'completed',
+                  accuracy: accuracyValue,
+                  physicsLoss: result.physicsLoss ? result.physicsLoss.physicsLoss : null,
+                  dataLoss: result.physicsLoss ? result.physicsLoss.dataLoss : null,
+                  boundaryLoss: result.physicsLoss ? result.physicsLoss.boundaryLoss : null,
+                  totalLoss: result.physicsLoss ? result.physicsLoss.totalLoss : null
+                })
+                .where(eq(pinnModels.id, model.id))
+                .then((result) => {
+                  // Use the model ID and training result data
+                  broadcast('modelTrainingUpdate', { 
+                    modelId: model.id, 
+                    status: 'completed',
+                    type: 'pinn',
+                    accuracy: accuracyValue,
+                    physicsLoss: result.physicsLoss
+                  });
+                })
+                .catch(updateErr => console.error('Error updating PINN model status:', updateErr));
+            } else {
+              db.update(pinnModels)
+                .set({ trainingStatus: 'failed' })
+                .where(eq(pinnModels.id, model.id))
+                .catch(updateErr => console.error('Error updating PINN model status:', updateErr));
+                
+              broadcast('modelTrainingUpdate', { 
+                modelId: model.id, 
+                status: 'failed',
+                type: 'pinn'
+              });
+            }
+          } catch (trainingError) {
+            console.error('Error in PINN model training process:', trainingError);
+            
+            db.update(pinnModels)
+              .set({ trainingStatus: 'failed' })
+              .where(eq(pinnModels.id, model.id))
+              .catch(updateErr => console.error('Error updating PINN model status:', updateErr));
+            
+            broadcast('modelTrainingUpdate', { 
+              modelId: model.id, 
+              status: 'failed',
+              type: 'pinn',
+              error: trainingError.message
+            });
+          }
+        });
+        
+        return res.status(202).json({ 
+          success: true, 
+          message: 'PINN model training started',
+          modelId: model.id
+        });
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+        return res.status(500).json({ 
+          success: false, 
+          message: `Database error: ${dbError.message}` 
+        });
+      }
+    } catch (error) {
+      console.error('Error starting PINN model training:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ 
+        success: false, 
+        message: `Error starting PINN model training: ${errorMessage}`
+      });
+    }
+  });
+
+  // Differential equation simulation routes
+  app.post('/api/simulation/diff-eq', async (req, res) => {
+    try {
+      const model = req.body;
+      
+      // Validate the model
+      if (!model.type || !model.parameters || !model.initialConditions) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid model: type, parameters, and initialConditions are required' 
+        });
+      }
+      
+      // Solve the differential equation
+      const results = await juliaBridge.solveDifferentialEquation(model);
+      
+      return res.json({
+        success: true,
+        results
+      });
+    } catch (error) {
+      console.error('Error solving differential equation:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ 
+        success: false, 
+        message: `Error solving differential equation: ${errorMessage}`
+      });
+    }
+  });
+
+  // Brooks Law model simulation
+  app.post('/api/simulation/brooks-law', async (req, res) => {
+    try {
+      const model = req.body;
+      
+      // Validate the model
+      if (!model.parameters || !model.initialConditions) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid Brooks Law model: parameters and initialConditions are required' 
+        });
+      }
+      
+      // Ensure required Brooks Law parameters
+      if (!model.productivityDecayFactor || !model.trainingOverhead || 
+          !model.nominalProductivity || !model.teamSize) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid Brooks Law model: specific Brooks Law parameters are required' 
+        });
+      }
+      
+      // Solve the Brooks Law model
+      const results = await juliaBridge.solveBrooksLawModel(model);
+      
+      return res.json({
+        success: true,
+        results
+      });
+    } catch (error) {
+      console.error('Error solving Brooks Law model:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ 
+        success: false, 
+        message: `Error solving Brooks Law model: ${errorMessage}`
+      });
+    }
+  });
+
+  // Critical Chain model simulation
+  app.post('/api/simulation/critical-chain', async (req, res) => {
+    try {
+      const model = req.body;
+      
+      // Validate the model
+      if (!model.parameters || !model.initialConditions) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid Critical Chain model: parameters and initialConditions are required' 
+        });
+      }
+      
+      // Ensure required Critical Chain parameters
+      if (!model.bufferSizeImpact || !model.resourceConstraintFactor || 
+          !model.multitaskingPenalty || !model.studentSyndromeFactor) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid Critical Chain model: specific Critical Chain parameters are required' 
+        });
+      }
+      
+      // Solve the Critical Chain model
+      const results = await juliaBridge.solveCriticalChainModel(model);
+      
+      return res.json({
+        success: true,
+        results
+      });
+    } catch (error) {
+      console.error('Error solving Critical Chain model:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ 
+        success: false, 
+        message: `Error solving Critical Chain model: ${errorMessage}`
       });
     }
   });
