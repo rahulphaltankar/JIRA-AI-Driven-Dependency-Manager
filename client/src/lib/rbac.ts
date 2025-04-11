@@ -1,4 +1,5 @@
 // Role-Based Access Control System
+import React from "react";
 
 export type Permission =
   // Dependency permissions
@@ -203,23 +204,31 @@ export function withPermission<P extends object>(
       : hasPermission(userPermissions, requiredPermission);
 
     if (hasAccess) {
-      return <Component {...(rest as P)} />;
+      return React.createElement(Component, rest as P);
     }
 
     if (FallbackComponent) {
-      return <FallbackComponent {...(rest as P)} />;
+      return React.createElement(FallbackComponent, rest as P);
     }
 
-    return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-        <div className="flex items-center">
-          <i className="material-icons text-red-500 mr-2">error</i>
-          <h3 className="text-red-800 font-medium">Access Denied</h3>
-        </div>
-        <p className="text-red-600 text-sm mt-1">
-          You don't have permission to access this feature
-        </p>
-      </div>
+    return React.createElement(
+      'div',
+      { className: "p-4 bg-red-50 border border-red-200 rounded-md" },
+      [
+        React.createElement(
+          'div',
+          { className: "flex items-center", key: "header" },
+          [
+            React.createElement('i', { className: "material-icons text-red-500 mr-2", key: "icon" }, "error"),
+            React.createElement('h3', { className: "text-red-800 font-medium", key: "title" }, "Access Denied")
+          ]
+        ),
+        React.createElement(
+          'p',
+          { className: "text-red-600 text-sm mt-1", key: "message" },
+          "You don't have permission to access this feature"
+        )
+      ]
     );
   };
 }
@@ -235,10 +244,10 @@ export function createProtectedRoute(requiredPermission: Permission | Permission
       : hasPermission(userPermissions, requiredPermission);
 
     if (hasAccess) {
-      return <Component {...rest} />;
+      return React.createElement(Component, rest);
     }
 
-    return <Redirect to="/unauthorized" />;
+    return React.createElement(Redirect, { to: "/unauthorized" });
   };
 }
 

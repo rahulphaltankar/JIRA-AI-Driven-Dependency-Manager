@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, dependencies, type Dependency, type InsertDependency, jiraConfigs, type JiraConfig, type InsertJiraConfig, optimizationRecommendations, type OptimizationRecommendation, type InsertOptimizationRecommendation, mlModels, type MlModel, type InsertMlModel } from "@shared/schema";
+import { users, type User, type InsertUser, dependencies, type Dependency, type InsertDependency, jiraConfigs, type JiraConfig, type InsertJiraConfig, optimizationRecommendations, type OptimizationRecommendation, type InsertOptimizationRecommendation, mlModels, type MlModel, type InsertMlModel, notifications, type Notification, type InsertNotification } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -33,6 +33,14 @@ export interface IStorage {
   getMlModel(id: number): Promise<MlModel | undefined>;
   createMlModel(model: InsertMlModel): Promise<MlModel>;
   updateMlModel(id: number, model: Partial<InsertMlModel>): Promise<MlModel | undefined>;
+  
+  // Notification operations
+  getNotifications(userId: number): Promise<Notification[]>;
+  getNotification(id: number): Promise<Notification | undefined>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: number): Promise<boolean>;
+  deleteNotification(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
