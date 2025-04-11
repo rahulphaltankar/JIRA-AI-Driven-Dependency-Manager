@@ -84,6 +84,12 @@ export default function UserGuide() {
                     ML Configuration
                   </button>
                   <button 
+                    onClick={() => scrollToSection("pinn-config")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "pinn-config" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    PINN Configuration
+                  </button>
+                  <button 
                     onClick={() => scrollToSection("roadmap")}
                     className={`block w-full text-left px-3 py-2 text-sm rounded-md ${activeTopic === "roadmap" ? "bg-primary text-white" : "text-gray-600 hover:bg-gray-100"}`}
                   >
@@ -394,6 +400,141 @@ export default function UserGuide() {
                     <div className="bg-purple-50 p-3 rounded-md border border-purple-200">
                       <p className="text-sm text-purple-800">
                         <strong>Advanced User Tip:</strong> For optimal results, use UDEs for complex dependency networks with time-dependent behaviors, and PINNs for networks with known physical or organizational constraints.
+                      </p>
+                    </div>
+                  </section>
+                  
+                  <section id="pinn-config" className="scroll-mt-20">
+                    <h2 className="text-xl font-semibold mb-3 text-gray-900 border-b pb-2">PINN Configuration</h2>
+                    <p className="mb-3">
+                      The PINN (Physics-Informed Neural Network) Configuration page enables you to create, train, and manage sophisticated neural network models that incorporate physics-based constraints for more accurate dependency management.
+                    </p>
+                    
+                    <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">Understanding PINNs:</h3>
+                    <div className="bg-blue-50 p-4 rounded-md border border-blue-200 mb-4">
+                      <p className="text-sm text-blue-900 mb-2">
+                        Physics-Informed Neural Networks (PINNs) combine deep learning with fundamental principles of dependency management. These models enforce physical and organizational constraints to ensure predictions respect real-world limitations and behaviors.
+                      </p>
+                      <p className="text-sm text-blue-900">
+                        PINNs excel at modeling complex dependencies where time, resources, and organizational dynamics interact in sophisticated ways that traditional ML models struggle to capture.
+                      </p>
+                    </div>
+                    
+                    <h3 className="text-lg font-medium text-gray-800 mt-4 mb-2">Page Components and Actions:</h3>
+                    <div className="space-y-6">
+                      <div className="border rounded-md p-4">
+                        <h4 className="font-medium text-gray-900 mb-2">Model Configuration Card</h4>
+                        <ul className="list-disc pl-6 space-y-2 text-sm">
+                          <li>
+                            <strong>Model Type Selection</strong>: Choose from different PINN model types:
+                            <ul className="list-circle pl-5 mt-1 space-y-1">
+                              <li><strong>Brooks' Law</strong>: Models how adding resources to a late project can further delay it</li>
+                              <li><strong>Critical Chain</strong>: Models resource contention and buffer management in project scheduling</li>
+                              <li><strong>Dependency Propagation</strong>: Models how delays cascade through dependency networks</li>
+                              <li><strong>Team Dynamics</strong>: Models how team interactions affect dependency resolution times</li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Equation Type Selection</strong>: Choose between:
+                            <ul className="list-circle pl-5 mt-1 space-y-1">
+                              <li><strong>ODE (Ordinary Differential Equations)</strong>: For time-dependent models without spatial variables</li>
+                              <li><strong>PDE (Partial Differential Equations)</strong>: For models with both time and spatial/organizational dimensions</li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Training Parameters</strong>: Configure training specifics:
+                            <ul className="list-circle pl-5 mt-1 space-y-1">
+                              <li><strong>Physics Loss Weight</strong>: Adjusts how strictly the model adheres to physics constraints (default: 0.5)</li>
+                              <li><strong>Data Loss Weight</strong>: Controls how closely the model fits historical data (default: 0.3)</li>
+                              <li><strong>Boundary Loss Weight</strong>: Determines enforcement of boundary conditions (default: 0.2)</li>
+                              <li><strong>Training Epochs</strong>: Number of complete passes through the training dataset</li>
+                              <li><strong>Learning Rate</strong>: Controls how quickly the model parameters are adjusted</li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Create Model Button</strong>: Initializes a new PINN model with specified configurations
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      <div className="border rounded-md p-4">
+                        <h4 className="font-medium text-gray-900 mb-2">Existing Models Section</h4>
+                        <ul className="list-disc pl-6 space-y-2 text-sm">
+                          <li>
+                            <strong>Model Cards</strong>: Each trained model is displayed as a card showing:
+                            <ul className="list-circle pl-5 mt-1 space-y-1">
+                              <li><strong>Model Name</strong>: Identifier for the PINN model</li>
+                              <li><strong>Model Type</strong>: Indicates which physical system the model represents</li>
+                              <li><strong>Training Status</strong>: Shows "pending", "training", "completed", or "failed"</li>
+                              <li><strong>Accuracy</strong>: How well the model performs on test data (if training is complete)</li>
+                              <li><strong>Physics Loss</strong>: Measurement of how well the model adheres to physics constraints</li>
+                              <li><strong>Creation Date</strong>: When the model was first created</li>
+                            </ul>
+                          </li>
+                          <li>
+                            <strong>Action Buttons</strong>: For each model:
+                            <ul className="list-circle pl-5 mt-1 space-y-1">
+                              <li><strong>View Details</strong>: Opens a detailed view of model parameters and performance metrics</li>
+                              <li><strong>Run Simulation</strong>: Executes the model with current dependency data</li>
+                              <li><strong>Delete</strong>: Removes the model from the system</li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      <div className="border rounded-md p-4">
+                        <h4 className="font-medium text-gray-900 mb-2">Training Progress Indicators</h4>
+                        <ul className="list-disc pl-6 space-y-1 text-sm">
+                          <li><strong>Progress Bar</strong>: Visual indicator of training completion percentage</li>
+                          <li><strong>Loss Curves</strong>: Real-time graphs showing how different loss components evolve during training</li>
+                          <li><strong>Status Messages</strong>: Text updates on current training phase</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="border rounded-md p-4">
+                        <h4 className="font-medium text-gray-900 mb-2">Model Results Visualization</h4>
+                        <ul className="list-disc pl-6 space-y-1 text-sm">
+                          <li><strong>Prediction Graphs</strong>: Visualizations of how dependencies will evolve over time</li>
+                          <li><strong>Comparative Analysis</strong>: Side-by-side comparison with traditional prediction methods</li>
+                          <li><strong>Sensitivity Analysis</strong>: Interactive tools to test how changes in parameters affect outcomes</li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-lg font-medium text-gray-800 mt-6 mb-2">User Workflow:</h3>
+                    <ol className="list-decimal pl-6 space-y-2 mb-4">
+                      <li>
+                        <strong>Create a PINN Model</strong>: Select the model type and parameters, then click "Create Model"
+                      </li>
+                      <li>
+                        <strong>Monitor Training Progress</strong>: Observe the training indicators as the model learns
+                      </li>
+                      <li>
+                        <strong>Evaluate Model Performance</strong>: Review accuracy and loss metrics once training completes
+                      </li>
+                      <li>
+                        <strong>Run Simulations</strong>: Use the trained model to simulate dependency outcomes
+                      </li>
+                      <li>
+                        <strong>Apply Insights</strong>: Incorporate simulation results into dependency management decisions
+                      </li>
+                    </ol>
+                    
+                    <div className="bg-yellow-50 p-3 rounded-md border border-yellow-200 mt-2">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Important:</strong> Training PINN models can be computationally intensive. For complex models, training might take several minutes to complete. The system will notify you when training is finished.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-green-50 p-3 rounded-md border border-green-200 mt-4">
+                      <p className="text-sm text-green-800">
+                        <strong>Best Practice:</strong> Start with simpler models (Brooks' Law or Dependency Propagation) before advancing to more complex PDE-based models. This helps establish baseline performance and understanding.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-purple-50 p-3 rounded-md border border-purple-200 mt-4">
+                      <p className="text-sm text-purple-800">
+                        <strong>Advanced User Tip:</strong> Experiment with different loss weight combinations to find the optimal balance between adhering to physics constraints and fitting historical data for your specific organizational context.
                       </p>
                     </div>
                   </section>
