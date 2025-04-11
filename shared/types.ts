@@ -76,6 +76,19 @@ export interface CrossArtDependency {
 export interface RiskAnalysis {
   riskFactors: string[];
   recommendations: string[];
+  rootCauses?: string[];
+  mitigationOptions?: Array<{
+    title: string;
+    description: string;
+    impact: number;
+    feasibility: number;
+  }>;
+  probabilityDistribution?: Array<{
+    date: string;
+    probability: number;
+  }>;
+  criticalPathImpact?: number;
+  confidenceScore?: number;
 }
 
 export interface OptimizationScenario {
@@ -85,6 +98,67 @@ export interface OptimizationScenario {
   riskReduction: number;
   timelineReduction: number;
   complexityScore: number;
+  modelType?: string;
+  parameters?: Record<string, any>;
+  results?: SimulationResults;
+  appliedConstraints?: string[];
+  teamReallocation?: Record<string, number>;
+  dependencyChanges?: Array<{
+    id: number;
+    action: 'add' | 'remove' | 'modify';
+    details: Record<string, any>;
+  }>;
+}
+
+export interface DifferentialEquationModel {
+  type: 'ODE' | 'PDE';
+  name: string;
+  formula: string;
+  parameters: Record<string, number>;
+  initialConditions: Record<string, number>;
+  boundaryConditions?: Record<string, any>;
+  timeRange?: [number, number];
+  stepSize?: number;
+}
+
+export interface BrooksLawModel extends DifferentialEquationModel {
+  productivityDecayFactor: number;
+  trainingOverhead: number;
+  nominalProductivity: number;
+  teamSize: number;
+}
+
+export interface CriticalChainModel extends DifferentialEquationModel {
+  bufferSizeImpact: number;
+  resourceConstraintFactor: number;
+  multitaskingPenalty: number;
+  studentSyndromeFactor: number;
+}
+
+export interface SimulationResults {
+  trajectories: Array<{
+    variable: string;
+    values: number[];
+    timePoints: number[];
+  }>;
+  statistics: {
+    mean: Record<string, number>;
+    variance: Record<string, number>;
+    quantiles: Record<string, number[]>;
+  };
+  convergence: {
+    status: 'converged' | 'diverged' | 'oscillating';
+    iterations: number;
+    residualError: number;
+  };
+}
+
+export interface PhysicsInformedLoss {
+  dataLoss: number;
+  physicsLoss: number;
+  boundaryLoss: number;
+  totalLoss: number;
+  gradients?: Record<string, number[]>;
 }
 
 export interface JiraConfig {
@@ -111,9 +185,98 @@ export interface MlConfig {
   parameters: Record<string, any>;
   trainingStatus: string;
   accuracy?: number;
+  f1Score?: number;
+  physicsCompliance?: number;
+  trainingTime?: number;
+  epochCount?: number;
+  lossHistory?: Array<{
+    epoch: number;
+    trainingLoss: number;
+    validationLoss: number;
+    physicsLoss?: number;
+  }>;
+  hyperparameters?: Record<string, any>;
+  architecture?: Array<{
+    layerType: string;
+    units?: number;
+    activation?: string;
+    dropout?: number;
+  }>;
+  featureImportance?: Record<string, number>;
+}
+
+export interface PinnConfig extends MlConfig {
+  equationType: 'ODE' | 'PDE';
+  equationFormula: string;
+  boundaryConditions: Record<string, any>;
+  initialConditions: Record<string, any>;
+  domainConstraints: Record<string, [number, number]>;
+  physicsLossWeight: number;
+  dataLossWeight: number;
+  boundaryLossWeight: number;
+}
+
+export interface NlpConfig extends MlConfig {
+  vectorDimension: number;
+  vocabularySize: number;
+  contextWindow: number;
+  sentimentAnalysis: boolean;
+  entityRecognition: boolean;
+  dependencyExtraction: boolean;
+  maxSequenceLength: number;
 }
 
 export interface WebSocketMessage {
-  type: 'dependencyUpdate' | 'recommendationUpdate' | 'modelTrainingUpdate';
+  type: 'dependencyUpdate' | 'recommendationUpdate' | 'modelTrainingUpdate' | 'simulationProgress' | 'collaborationUpdate' | 'systemAlert' | 'integrationEvent';
   data: any;
+  timestamp: string;
+  userId?: number;
+  sessionId?: number;
+}
+
+export interface CollaborationSession {
+  id: number;
+  name: string;
+  creator: {
+    id: number;
+    username: string;
+  };
+  participants: Array<{
+    id: number;
+    username: string;
+    role: 'viewer' | 'editor' | 'admin';
+    joinedAt: string;
+  }>;
+  analysisType: string;
+  entity: {
+    id: number;
+    type: string;
+    name: string;
+  };
+  annotations: Array<{
+    id: number;
+    content: string;
+    position: Record<string, any>;
+    author: {
+      id: number;
+      username: string;
+    };
+    createdAt: string;
+  }>;
+  isActive: boolean;
+  expiresAt?: string;
+  createdAt: string;
+}
+
+export interface AuditEvent {
+  id: number;
+  userId: number;
+  username: string;
+  action: string;
+  entityType: string;
+  entityId?: number;
+  details?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: string;
 }

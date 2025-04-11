@@ -2,6 +2,8 @@ import fetch from 'node-fetch';
 import { storage } from './storage';
 import { InsertDependency } from '@shared/schema';
 import { juliaBridge } from './julia-bridge';
+import { WebSocketServer } from 'ws';
+import { Server } from 'http';
 
 interface JiraApiOptions {
   method: string;
@@ -34,6 +36,7 @@ interface JiraIssue {
     customfield_10007?: string; // Epic Link
     customfield_10010?: string; // Team field (example)
     customfield_10011?: string; // ART field (example)
+    issuelinks?: JiraIssueLink[]; // Issue links
   };
 }
 
@@ -55,12 +58,32 @@ interface JiraTeam {
   art?: string;
 }
 
+interface AtlassianIntegrationConfig {
+  useOAuth: boolean;
+  oauthClientId?: string;
+  oauthSecret?: string;
+  webhookEnabled: boolean;
+  webhookUrl?: string;
+}
+
 class JiraClient {
   private jiraUrl: string | null = null;
   private jiraEmail: string | null = null;
   private jiraToken: string | null = null;
   private jiraAlignUrl: string | null = null;
   private jiraAlignToken: string | null = null;
+  private confluenceUrl: string | null = null;
+  private confluenceToken: string | null = null;
+  private bitbucketUrl: string | null = null;
+  private bitbucketToken: string | null = null;
+  private trelloKey: string | null = null;
+  private trelloToken: string | null = null;
+  private useOAuth: boolean = false;
+  private oauthClientId: string | null = null;
+  private oauthSecret: string | null = null;
+  private webhookEnabled: boolean = false;
+  private webhookUrl: string | null = null;
+  private webhookServer: WebSocketServer | null = null;
   
   constructor() {
     this.loadConfig();
@@ -75,9 +98,151 @@ class JiraClient {
         this.jiraToken = config.jiraToken;
         this.jiraAlignUrl = config.jiraAlignUrl || null;
         this.jiraAlignToken = config.jiraAlignToken || null;
+        this.confluenceUrl = config.confluenceUrl || null;
+        this.confluenceToken = config.confluenceToken || null;
+        this.bitbucketUrl = config.bitbucketUrl || null;
+        this.bitbucketToken = config.bitbucketToken || null;
+        this.trelloKey = config.trelloKey || null;
+        this.trelloToken = config.trelloToken || null;
+        this.useOAuth = config.useOAuth || false;
+        this.oauthClientId = config.oauthClientId || null;
+        this.oauthSecret = config.oauthSecret || null;
+        this.webhookEnabled = config.webhookEnabled || false;
+        this.webhookUrl = config.webhookUrl || null;
       }
     } catch (error) {
       console.error("Error loading Jira configuration:", error);
+    }
+  }
+  
+  setupWebhookServer(server: Server) {
+    if (this.webhookEnabled && this.webhookUrl) {
+      try {
+        this.webhookServer = new WebSocketServer({
+          server,
+          path: '/jira-webhook'
+        });
+        
+        this.webhookServer.on('connection', (ws) => {
+          console.log('Jira webhook client connected');
+          
+          ws.on('message', async (message) => {
+            try {
+              const data = JSON.parse(message.toString());
+              console.log('Received webhook event:', data.webhookEvent);
+              
+              // Process different webhook events
+              if (data.webhookEvent === 'jira:issue_updated') {
+                await this.processIssueUpdateEvent(data);
+              } else if (data.webhookEvent === 'jira:issue_created') {
+                await this.processIssueCreateEvent(data);
+              } else if (data.webhookEvent === 'jira:issue_deleted') {
+                await this.processIssueDeleteEvent(data);
+              }
+            } catch (error) {
+              console.error('Error processing webhook message:', error);
+            }
+          });
+          
+          ws.on('close', () => {
+            console.log('Jira webhook client disconnected');
+          });
+        });
+        
+        console.log('Jira webhook server set up successfully');
+      } catch (error) {
+        console.error('Error setting up Jira webhook server:', error);
+      }
+    }
+  }
+  
+  async processIssueUpdateEvent(data: any) {
+    // Extract the issue key
+    const issueKey = data.issue?.key;
+    if (!issueKey) return;
+    
+    // Fetch the full issue data to get linked issues
+    const issue = await this.getIssue(issueKey);
+    
+    // Check if this issue has dependencies that need updating
+    const dependencies = await storage.getDependencies();
+    const affectedDependencies = dependencies.filter(d => d.jiraId === issueKey);
+    
+    for (const dependency of affectedDependencies) {
+      // Update dependency status based on the issue status
+      const status = this.mapJiraStatusToDependencyStatus(issue.fields.status.name);
+      
+      // Update risk score
+      let riskScore = dependency.riskScore;
+      if (issue.fields.issuelinks && issue.fields.issuelinks.length > 0) {
+        for (const link of issue.fields.issuelinks) {
+          if (link.inwardIssue) {
+            const linkedIssue = await this.getIssue(link.inwardIssue.key);
+            riskScore = await this.calculateRiskScore(issue, linkedIssue);
+            break;
+          }
+        }
+      }
+      
+      // Update the dependency
+      await storage.updateDependency(dependency.id, {
+        status,
+        riskScore,
+        description: `Updated from Jira webhook: ${issue.fields.description || 'No description'}`
+      });
+    }
+  }
+  
+  async processIssueCreateEvent(data: any) {
+    // Handle new issue creation - check if it creates new dependencies
+    const issueKey = data.issue?.key;
+    if (!issueKey) return;
+    
+    // Fetch the full issue data
+    const issue = await this.getIssue(issueKey);
+    
+    // Check for issue links that indicate dependencies
+    if (issue.fields.issuelinks && issue.fields.issuelinks.length > 0) {
+      for (const link of issue.fields.issuelinks) {
+        if (['blocks', 'depends on', 'is blocked by'].includes(link.type.name) && link.inwardIssue) {
+          const linkedIssue = await this.getIssue(link.inwardIssue.key);
+          
+          // Create a new dependency
+          const dependency: InsertDependency = {
+            title: `${issue.fields.summary} → ${linkedIssue.fields.summary}`,
+            sourceTeam: issue.fields.customfield_10010 || 'Unknown Team',
+            sourceArt: issue.fields.customfield_10011 || 'Unknown ART',
+            targetTeam: linkedIssue.fields.customfield_10010 || 'Unknown Team',
+            targetArt: linkedIssue.fields.customfield_10011 || 'Unknown ART',
+            dueDate: issue.fields.duedate ? new Date(issue.fields.duedate) : null,
+            status: this.mapJiraStatusToDependencyStatus(issue.fields.status.name),
+            riskScore: await this.calculateRiskScore(issue, linkedIssue),
+            jiraId: issue.key,
+            description: `Dependency between ${issue.key} and ${linkedIssue.key}: ${issue.fields.description || 'No description'}`,
+            isCrossArt: issue.fields.customfield_10011 !== linkedIssue.fields.customfield_10011
+          };
+          
+          await storage.createDependency(dependency);
+        }
+      }
+    }
+  }
+  
+  async processIssueDeleteEvent(data: any) {
+    // Handle issue deletion
+    const issueKey = data.issue?.key;
+    if (!issueKey) return;
+    
+    // Find any dependencies related to this issue
+    const dependencies = await storage.getDependencies();
+    const affectedDependencies = dependencies.filter(d => d.jiraId === issueKey);
+    
+    // Delete or mark them as completed
+    for (const dependency of affectedDependencies) {
+      await storage.updateDependency(dependency.id, {
+        status: 'completed',
+        description: `Issue ${issueKey} was deleted in Jira`
+      });
     }
   }
   
@@ -88,13 +253,15 @@ class JiraClient {
     
     const auth = Buffer.from(`${this.jiraEmail}:${this.jiraToken}`).toString('base64');
     
+    const headers: Record<string, string> = {
+      'Authorization': `Basic ${auth}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+    
     const options: RequestInit = {
       method,
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers
     };
     
     if (body) {
@@ -114,7 +281,7 @@ class JiraClient {
       }
       
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error making Jira request to ${url}:`, error);
       throw error;
     }
@@ -125,13 +292,15 @@ class JiraClient {
       throw new Error("Jira Align configuration is not set");
     }
     
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${this.jiraAlignToken}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+    
     const options: RequestInit = {
       method,
-      headers: {
-        'Authorization': `Bearer ${this.jiraAlignToken}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      headers
     };
     
     if (body) {
@@ -151,7 +320,7 @@ class JiraClient {
       }
       
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error making Jira Align request to ${url}:`, error);
       throw error;
     }
