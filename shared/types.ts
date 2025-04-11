@@ -9,20 +9,45 @@ export interface DependencyMetrics {
   blockedItemsChange: string;
   optimizationScore: string;
   optimizationScoreChange: string;
+  averageCycleTime?: number;
+  cycleTimeChange?: string;
+  networkDensity?: number;
+  networkDensityChange?: string;
+  implicitDependencies?: number;
+  criticalPathLength?: number;
+  deliveryRiskIndex?: number;
+  conwayCompliance?: number;
 }
 
 export interface DependencyNode {
   id: string;
   name: string;
   group: number;
-  type: 'team' | 'epic';
+  type: 'team' | 'epic' | 'feature' | 'component' | 'service';
   status?: 'completed' | 'in-progress' | 'at-risk' | 'blocked';
+  size?: number; // Size of the node for visualization
+  centrality?: number; // Network centrality metric
+  velocity?: number; // Team velocity
+  capacity?: number; // Team capacity
+  isOnCriticalPath?: boolean;
+  clusterGroup?: string; // Used for community detection algorithms
+  leadTime?: number; // Lead time in days
+  cycleTime?: number; // Cycle time in days
+  metadata?: Record<string, any>; // Additional metadata
+  position?: { x: number; y: number }; // Fixed position if needed
 }
 
 export interface DependencyLink {
   source: string;
   target: string;
   value: number;
+  type?: 'blocks' | 'implements' | 'relates' | 'depends-on' | 'implicit' | 'predicted';
+  strength?: number; // 0-1 for relationship strength
+  isOnCriticalPath?: boolean;
+  riskScore?: number;
+  leadTimeImpact?: number;
+  metadata?: Record<string, any>; // Additional metadata
+  isArtificial?: boolean; // For showing hypothetical scenarios
 }
 
 export interface DependencyNetwork {
@@ -68,6 +93,17 @@ export interface JiraConfig {
   jiraToken: string;
   jiraAlignUrl?: string;
   jiraAlignToken?: string;
+  useOAuth?: boolean;
+  oauthClientId?: string;
+  oauthSecret?: string;
+  confluenceUrl?: string;
+  confluenceToken?: string;
+  bitbucketUrl?: string;
+  bitbucketToken?: string;
+  trelloKey?: string;
+  trelloToken?: string;
+  webhookEnabled?: boolean;
+  webhookUrl?: string;
 }
 
 export interface MlConfig {

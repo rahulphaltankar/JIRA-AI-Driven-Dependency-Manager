@@ -48,6 +48,27 @@ export const dependencies = pgTable("dependencies", {
   jiraId: text("jira_id"),
   description: text("description"),
   isCrossArt: boolean("is_cross_art").default(false),
+  isImplicit: boolean("is_implicit").default(false), // Detected via NLP
+  complexity: integer("complexity").default(50), // 0-100 scale
+  impactLevel: text("impact_level").default("medium"), // low, medium, high
+  cycleTime: integer("cycle_time"), // In days
+  blockerCount: integer("blocker_count").default(0),
+  criticalPathPosition: integer("critical_path_position"), // Position in critical path (if applicable)
+  networkCentrality: real("network_centrality"), // Graph metric for dependency importance
+  sentimentScore: real("sentiment_score"), // From NLP analysis
+  leadTimeImpact: integer("lead_time_impact").default(0), // Estimated impact on lead time in days
+  embeddings: jsonb("embeddings"), // Vector embeddings for semantic search
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const dependencyComments = pgTable("dependency_comments", {
+  id: serial("id").primaryKey(),
+  dependencyId: integer("dependency_id").references(() => dependencies.id),
+  userId: integer("user_id").references(() => users.id),
+  content: text("content").notNull(),
+  sentiment: text("sentiment"),
+  attachments: jsonb("attachments"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -73,6 +94,117 @@ export const mlModels = pgTable("ml_models", {
   parameters: json("parameters"),
   trainingStatus: text("training_status").default("pending"),
   accuracy: integer("accuracy"),
+  f1Score: real("f1_score"),
+  physicsCompliance: real("physics_compliance"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const pinnModels = pgTable("pinn_models", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  modelType: text("model_type").notNull(), // brooks_law, critical_chain, dependency_propagation, team_dynamics
+  equationType: text("equation_type").notNull(), // ode, pde
+  equationFormula: text("equation_formula").notNull(),
+  parameters: jsonb("parameters").notNull(),
+  trainingData: jsonb("training_data"),
+  trainingStatus: text("training_status").default("pending"),
+  accuracy: real("accuracy"),
+  physicsCompliance: real("physics_compliance"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const simulationScenarios = pgTable("simulation_scenarios", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  pinnModelId: integer("pinn_model_id").references(() => pinnModels.id),
+  parameters: jsonb("parameters").notNull(),
+  results: jsonb("results"),
+  status: text("status").default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const causalAnalyses = pgTable("causal_analyses", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  dependencyId: integer("dependency_id").references(() => dependencies.id),
+  rootCauses: jsonb("root_causes"),
+  interventions: jsonb("interventions"),
+  counterfactuals: jsonb("counterfactuals"),
+  confidence: real("confidence"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Collaborative features
+export const sharedSessions = pgTable("shared_sessions", {
+  id: serial("id").primaryKey(),
+  creatorId: integer("creator_id").references(() => users.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  analysisType: text("analysis_type").notNull(), // 'dependency', 'risk', 'causal'
+  entityId: integer("entity_id"), // ID of the entity being analyzed
+  sessionData: jsonb("session_data"),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const sessionParticipants = pgTable("session_participants", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").references(() => sharedSessions.id),
+  userId: integer("user_id").references(() => users.id),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  role: text("role").default("viewer"), // 'viewer', 'editor', 'admin'
+});
+
+export const sessionAnnotations = pgTable("session_annotations", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").references(() => sharedSessions.id),
+  userId: integer("user_id").references(() => users.id),
+  content: text("content").notNull(),
+  position: jsonb("position"), // coordinates or reference point in the visualization
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").notNull(), // 'dependency_change', 'risk_alert', 'recommendation', etc.
+  referenceId: integer("reference_id"), // ID of the related entity
+  referenceType: text("reference_type"), // Type of the related entity
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Security and audit
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: integer("entity_id"),
+  details: jsonb("details"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Integration with messaging platforms
+export const integrationConnections = pgTable("integration_connections", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  platform: text("platform").notNull(), // 'slack', 'teams', etc.
+  connectionData: jsonb("connection_data"),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -100,6 +232,58 @@ export const insertOptimizationRecommendationSchema = createInsertSchema(optimiz
 export const insertMlModelSchema = createInsertSchema(mlModels).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPinnModelSchema = createInsertSchema(pinnModels).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSimulationScenarioSchema = createInsertSchema(simulationScenarios).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCausalAnalysisSchema = createInsertSchema(causalAnalyses).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertDependencyCommentSchema = createInsertSchema(dependencyComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSharedSessionSchema = createInsertSchema(sharedSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSessionParticipantSchema = createInsertSchema(sessionParticipants).omit({
+  id: true,
+  joinedAt: true,
+});
+
+export const insertSessionAnnotationSchema = createInsertSchema(sessionAnnotations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertIntegrationConnectionSchema = createInsertSchema(integrationConnections).omit({
+  id: true,
+  createdAt: true,
 });
 
 // Types
@@ -117,3 +301,33 @@ export type InsertOptimizationRecommendation = z.infer<typeof insertOptimization
 
 export type MlModel = typeof mlModels.$inferSelect;
 export type InsertMlModel = z.infer<typeof insertMlModelSchema>;
+
+export type PinnModel = typeof pinnModels.$inferSelect;
+export type InsertPinnModel = z.infer<typeof insertPinnModelSchema>;
+
+export type SimulationScenario = typeof simulationScenarios.$inferSelect;
+export type InsertSimulationScenario = z.infer<typeof insertSimulationScenarioSchema>;
+
+export type CausalAnalysis = typeof causalAnalyses.$inferSelect;
+export type InsertCausalAnalysis = z.infer<typeof insertCausalAnalysisSchema>;
+
+export type DependencyComment = typeof dependencyComments.$inferSelect;
+export type InsertDependencyComment = z.infer<typeof insertDependencyCommentSchema>;
+
+export type SharedSession = typeof sharedSessions.$inferSelect;
+export type InsertSharedSession = z.infer<typeof insertSharedSessionSchema>;
+
+export type SessionParticipant = typeof sessionParticipants.$inferSelect;
+export type InsertSessionParticipant = z.infer<typeof insertSessionParticipantSchema>;
+
+export type SessionAnnotation = typeof sessionAnnotations.$inferSelect;
+export type InsertSessionAnnotation = z.infer<typeof insertSessionAnnotationSchema>;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+
+export type IntegrationConnection = typeof integrationConnections.$inferSelect;
+export type InsertIntegrationConnection = z.infer<typeof insertIntegrationConnectionSchema>;
