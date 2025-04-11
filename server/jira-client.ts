@@ -357,7 +357,7 @@ class JiraClient {
             method: 'GET',
             url: '/api/team/list' // Example endpoint
           });
-        } catch (alignError) {
+        } catch (alignError: any) {
           // Restore original values
           this.jiraUrl = originalUrl;
           this.jiraEmail = originalEmail;
@@ -378,7 +378,7 @@ class JiraClient {
       this.jiraToken = originalToken;
       
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { 
         success: false, 
         message: `Connection failed: ${error.message}` 
@@ -392,7 +392,7 @@ class JiraClient {
     const response = await this.makeJiraRequest({
       method: 'GET',
       url: '/rest/api/3/project'
-    });
+    }) as any[];
     
     return response.map((project: any) => ({
       id: project.id,
@@ -404,10 +404,12 @@ class JiraClient {
   async getIssue(issueKey: string): Promise<JiraIssue> {
     await this.loadConfig();
     
-    return await this.makeJiraRequest({
+    const issue = await this.makeJiraRequest({
       method: 'GET',
       url: `/rest/api/3/issue/${issueKey}`
-    });
+    }) as JiraIssue;
+    
+    return issue;
   }
   
   async getIssueLinks(issueKey: string): Promise<JiraIssueLink[]> {
@@ -439,9 +441,9 @@ class JiraClient {
             'customfield_10011'  // ART field (example)
           ]
         }
-      });
+      }) as { issues?: JiraIssue[] };
       
-      if (!response.issues || !Array.isArray(response.issues)) {
+      if (!response || !response.issues || !Array.isArray(response.issues)) {
         return { success: false, message: 'No issues found with dependencies' };
       }
       
@@ -487,7 +489,7 @@ class JiraClient {
         count: importedCount,
         message: `Successfully imported ${importedCount} dependencies` 
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error importing dependencies:', error);
       return { 
         success: false, 
