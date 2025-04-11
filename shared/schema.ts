@@ -113,6 +113,13 @@ export const pinnModels = pgTable("pinn_models", {
   trainingStatus: text("training_status").default("pending"),
   accuracy: real("accuracy"),
   physicsCompliance: real("physics_compliance"),
+  physicsLoss: real("physics_loss"),
+  dataLoss: real("data_loss"),
+  boundaryLoss: real("boundary_loss"),
+  totalLoss: real("total_loss"),
+  physicsLossWeight: real("physics_loss_weight").default(0.5),
+  dataLossWeight: real("data_loss_weight").default(0.3),
+  boundaryLossWeight: real("boundary_loss_weight").default(0.2),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

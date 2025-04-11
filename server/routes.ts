@@ -650,11 +650,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .values({
             name: modelConfig.name,
             description: modelConfig.description || '',
-            equation: modelConfig.equationFormula || 'du/dt = f(u,t)',
+            modelType: 'pinn',
+            equationFormula: modelConfig.equationFormula || 'du/dt = f(u,t)',
             equationType: modelConfig.equationType,
             parameters: modelConfig.parameters || {},
-            boundaryConditions: modelConfig.boundaryConditions || {},
-            initialConditions: modelConfig.initialConditions || {},
             physicsLossWeight: modelConfig.physicsLossWeight || 0.5,
             dataLossWeight: modelConfig.dataLossWeight || 0.3,
             boundaryLossWeight: modelConfig.boundaryLossWeight || 0.2,
@@ -689,14 +688,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   totalLoss: result.physicsLoss ? result.physicsLoss.totalLoss : null
                 })
                 .where(eq(pinnModels.id, model.id))
-                .then((result) => {
+                .then(() => {
                   // Use the model ID and training result data
                   broadcast('modelTrainingUpdate', { 
                     modelId: model.id, 
                     status: 'completed',
                     type: 'pinn',
                     accuracy: accuracyValue,
-                    physicsLoss: result.physicsLoss
+                    physicsLoss: result.physicsLoss ? result.physicsLoss.physicsLoss : null
                   });
                 })
                 .catch(updateErr => console.error('Error updating PINN model status:', updateErr));
@@ -712,7 +711,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 type: 'pinn'
               });
             }
-          } catch (trainingError) {
+          } catch (trainingErrorRaw) {
+            const trainingError = trainingErrorRaw as Error;
             console.error('Error in PINN model training process:', trainingError);
             
             db.update(pinnModels)
@@ -724,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               modelId: model.id, 
               status: 'failed',
               type: 'pinn',
-              error: trainingError.message
+              error: trainingError.message || 'Unknown error during training'
             });
           }
         });
@@ -734,11 +734,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: 'PINN model training started',
           modelId: model.id
         });
-      } catch (dbError) {
+      } catch (dbErrorRaw) {
+        const dbError = dbErrorRaw as Error;
         console.error('Database error:', dbError);
         return res.status(500).json({ 
           success: false, 
-          message: `Database error: ${dbError.message}` 
+          message: `Database error: ${dbError.message || 'Unknown database error'}` 
         });
       }
     } catch (error) {

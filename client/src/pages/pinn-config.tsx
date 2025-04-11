@@ -825,11 +825,17 @@ export default function PinnConfig() {
                           </div>
                           <div>
                             <span className="text-gray-500">Physics Loss:</span>{" "}
-                            <span className="font-medium">{model.physicsLoss !== null ? model.physicsLoss.toFixed(4) : 'N/A'}</span>
+                            <span className="font-medium">{model.physicsLoss ? model.physicsLoss.toFixed(4) : 'N/A'}</span>
                           </div>
                           <div>
                             <span className="text-gray-500">Created:</span>{" "}
-                            <span className="font-medium">{new Date(model.createdAt).toLocaleDateString()}</span>
+                            <span className="font-medium">
+                              {model.createdAt ? 
+                                (typeof model.createdAt === 'string' ? 
+                                  new Date(model.createdAt).toLocaleDateString() : 
+                                  model.createdAt.toLocaleDateString()
+                                ) : 'N/A'}
+                            </span>
                           </div>
                         </div>
                         
