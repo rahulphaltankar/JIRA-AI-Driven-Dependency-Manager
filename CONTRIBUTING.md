@@ -4,7 +4,7 @@ Thank you for your interest in contributing to JIRA-AI Dependency Tracker! This 
 
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). We expect all contributors to adhere to this code to ensure a positive and respectful environment for everyone.
+We expect all contributors to be respectful and professional in all interactions. Our aim is to foster an open and welcoming environment for everyone, regardless of background or experience level.
 
 ## How Can I Contribute?
 
@@ -62,8 +62,8 @@ Use the feature request template when opening an issue.
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/jira-ai-dependency-tracker.git
-   cd jira-ai-dependency-tracker
+   git clone https://github.com/yourusername/jira-pinn-dependency-tracker.git
+   cd jira-pinn-dependency-tracker
    ```
 
 2. Install dependencies
@@ -122,6 +122,5 @@ If you're new to the scientific concepts used in this project:
 If you have questions or need help, you can:
 
 - Open an issue on GitHub
-- Reach out to the maintainers directly at maintainers@yourdomain.com
 
 Thank you for contributing to JIRA-AI Dependency Tracker!

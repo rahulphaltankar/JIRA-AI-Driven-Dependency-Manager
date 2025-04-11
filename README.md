@@ -13,8 +13,6 @@
 
 JIRA-AI Dependency Tracker is an enterprise-grade SaaS application that leverages advanced Scientific Machine Learning and Physics-Informed Neural Networks (PINNs) to revolutionize dependency management in Jira and Jira Align.
 
-![Dashboard](path-to-dashboard-screenshot.png)
-
 ## 🚀 Features
 
 ### Advanced Dependency Modeling
@@ -81,8 +79,8 @@ JIRA-AI Dependency Tracker is built on a modern, scalable stack:
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/jira-ai-dependency-tracker.git
-cd jira-ai-dependency-tracker
+git clone https://github.com/yourusername/jira-pinn-dependency-tracker.git
+cd jira-pinn-dependency-tracker
 
 # Install dependencies
 npm install
@@ -100,13 +98,13 @@ npm run dev
 
 ## 📖 Documentation
 
-Comprehensive documentation is available in the [docs](./docs) directory:
+Comprehensive documentation will be available in the docs directory soon. The application includes a built-in user guide and configuration sections that provide detailed information on:
 
-- [User Guide](./docs/user-guide.md)
-- [Administrator Guide](./docs/admin-guide.md)
-- [API Reference](./docs/api-reference.md)
-- [Scientific Models](./docs/scientific-models.md)
-- [Integration Guide](./docs/integration.md)
+- User Guide and Onboarding
+- Administrator Configuration
+- API Reference 
+- Scientific Models
+- Integration with Jira and Jira Align
 
 ## 🤝 Contributing
 
@@ -124,7 +122,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💬 Support
 
-For questions, feedback, or support, please open an issue in the GitHub repository or contact us at support@yourdomain.com.
+For questions, feedback, or support, please open an issue in the GitHub repository.
 
 ## ✨ Acknowledgements
 
@@ -135,5 +133,5 @@ For questions, feedback, or support, please open an issue in the GitHub reposito
 ---
 
 <div align="center">
-<p>Built with ❤️ by Your Organization</p>
+<p>Built with ❤️ for the Agile community</p>
 </div>
