@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, uniqueIndex, jsonb, real, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -20,7 +20,19 @@ export const jiraConfigs = pgTable("jira_configs", {
   jiraEmail: text("jira_email").notNull(),
   jiraAlignUrl: text("jira_align_url"),
   jiraAlignToken: text("jira_align_token"),
+  useOAuth: boolean("use_oauth").default(false),
+  oauthClientId: text("oauth_client_id"),
+  oauthSecret: text("oauth_secret"),
+  confluenceUrl: text("confluence_url"),
+  confluenceToken: text("confluence_token"),
+  bitbucketUrl: text("bitbucket_url"),
+  bitbucketToken: text("bitbucket_token"),
+  trelloKey: text("trello_key"),
+  trelloToken: text("trello_token"),
+  webhookEnabled: boolean("webhook_enabled").default(false),
+  webhookUrl: text("webhook_url"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const dependencies = pgTable("dependencies", {

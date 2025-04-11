@@ -1,0 +1,233 @@
+Prompt for Building a Jira-Julia AI Dependency Tracker with Physics-Informed Neural Networks
+Project Overview
+Create a sophisticated Jira and Jira Align dependency tracking system powered by Physics-Informed Neural Networks (PINNs) and Scientific Machine Learning. This system will revolutionize project management by modeling dependencies and project dynamics as physical systems governed by differential equations.
+
+The application should combine Atlassian API integration with cutting-edge computational approaches from scientific computing to provide unprecedented accuracy in risk prediction, dependency management, and project forecasting.
+
+Core Requirements
+Atlassian Integration
+Jira Integration
+
+Connect to Jira Cloud/Server APIs to extract issues, epics, and their relationships
+Implement OAuth 2.0 and PAT authentication (with graceful fallback)
+Enable real-time webhook-based synchronization with Jira
+Capture issue transitions, comments, and status changes
+Jira Align Integration
+
+Connect to Jira Align's API for portfolio and program-level dependency tracking
+Map strategic initiatives to their tactical implementations
+Extract cross-team and cross-project dependencies
+Integrate with Jira Align's roadmapping capabilities
+Atlassian Ecosystem Support
+
+Add integration points for Confluence (documentation linking)
+Support Bitbucket for code-level dependency analysis
+Enable Trello board integration for simpler project structures
+Physics-Informed Neural Networks Implementation
+Differential Equation Modeling
+
+Model Brooks' Law as a PDE: ∂P/∂t = α*P - β*P² (where P is productivity over time)
+Implement Critical Chain as a PDE: ∂D/∂b = -γ*D/(b² + δ) (duration vs buffer relationship)
+Create a Dependency Propagation PDE: ∂R/∂t + v*∇R = σ*∇²R (risk propagation through networks)
+Develop Team Dynamics ODE: dV/dt = κ*V*(1-V/Vmax) - λ*D*V (velocity affected by dependencies)
+Julia Integration
+
+Implement Julia backend for solving differential equations (using DifferentialEquations.jl)
+Create Julia-Python/JavaScript bridge for high-performance computations
+Develop tiered computation modes (Full/Selective/Minimal) for performance scaling
+Optimize PDE solvers for large dependency networks
+Neural Network Architecture
+
+Design PINN architecture with physics-informed loss functions
+Implement transfer learning from pre-trained models
+Create embeddings for Jira issue types and their semantic relationships
+Build attention mechanisms for focusing on critical dependencies
+Advanced Analytics
+Predictive Capabilities
+
+Implement Monte Carlo simulations for delivery date probability distributions
+Create what-if analysis tools for dependency modifications
+Forecast resource bottlenecks using team velocity models
+Model cascading impacts of delays through the dependency network
+Visualization Engine
+
+Create dynamic force-directed dependency graphs with physics-based animations
+Implement program-level heatmaps showing cross-team dependencies
+Build interactive timeline visualizations with risk overlays
+Develop portfolio-level dashboards showing strategic-to-tactical dependencies
+Risk Scoring System
+
+Design a comprehensive risk scoring algorithm incorporating multiple factors:
+Dependency network complexity (cyclomatic complexity metrics)
+Historical team performance data
+Resource allocation patterns
+Critical path analysis and buffer consumption rates
+Conway's Law implications for organizational dependencies
+Technical Architecture
+Frontend
+
+React with TypeScript for type safety
+D3.js for advanced visualizations
+TanStack Query for state management
+WebSocket for real-time updates
+Tailwind CSS with Shadcn UI for modern design
+Backend
+
+Node.js Express server for API handling
+Python service for scientific computing and NLP
+Julia service for differential equation solving
+PostgreSQL for structured data storage
+Redis for caching and real-time messaging
+Scientific ML Stack
+
+Julia's DifferentialEquations.jl for ODE/PDE solving
+PyTorch with DeepXDE for PINN implementation
+SciML ecosystem for scientific machine learning
+Flux.jl for Julia-native deep learning
+CUDA support for GPU acceleration
+DevOps Requirements
+
+Containerization with Docker for consistent environments
+Kubernetes for orchestration and scaling
+CI/CD pipeline for automated testing and deployment
+Monitoring and alerting for model performance
+Automated backups for trained models and data
+Security and Compliance Features
+Enhanced Security
+
+OAuth 2.0 integration with Atlassian accounts
+Role-based access control mapped to Jira permissions
+Audit logging for all system actions
+Encryption for sensitive data at rest and in transit
+Regular security scanning and penetration testing
+Privacy and Compliance
+
+GDPR-compliant data handling with anonymization options
+Data minimization principles in model training
+User opt-out capabilities for data processing
+Transparent AI decision explanations for regulatory compliance
+Regional data residency options
+Advanced Features
+Natural Language Processing
+
+Extract implicit dependencies from issue descriptions and comments
+Analyze sentiment in communications for early risk detection
+Generate contextual summaries of complex dependency chains
+Recommend improvements to issue descriptions for clarity
+Optimization Engine
+
+Suggest dependency network optimizations to reduce risk
+Recommend team composition changes to improve velocity
+Propose sprint allocation adjustments based on dependency networks
+Generate optimal roadmaps based on dependency constraints
+Cross-Portfolio Intelligence
+
+Identify patterns across multiple portfolios and programs
+Detect organizational silos through dependency analysis
+Highlight reusable components across projects
+Measure and visualize the health of scaled agile implementations
+Causal Inference
+
+Apply causal inference techniques to distinguish correlation from causation
+Identify root causes of systematic delays
+Measure intervention effects through quasi-experimental design
+Create counterfactual scenarios for improved planning
+User Experience Requirements
+Intuitive Interface
+
+Role-based dashboards for different stakeholders
+Progressive disclosure of complexity based on user expertise
+Guided workflow for common dependency management tasks
+Mobile-responsive design for on-the-go access
+Collaborative Features
+
+Shared dependency analysis sessions with annotations
+Team-based risk assessment workflows
+Notification system for critical dependency changes
+Integration with Slack and Microsoft Teams
+Explainability
+
+Plain-language explanations of model predictions
+Interactive exploration of causal relationships
+Confidence intervals for all predictions
+Educational content about the underlying scientific principles
+Implementation Approach
+Phase 1: Foundation
+
+Core Atlassian API integration and data collection
+Data modeling and preprocessing pipelines
+Basic visualization and user interface
+Initial database schema and architecture
+Phase 2: PINN Implementation
+
+Initial differential equation models in Julia
+Basic neural network implementation
+Physics-informed loss functions
+Integration between Julia and web application
+Phase 3: Advanced Analytics
+
+Risk prediction algorithms
+Monte Carlo simulations
+Critical path analysis
+Cascade impact modeling
+Phase 4: Advanced UX and Visualization
+
+Dynamic dependency graphs
+Interactive dashboards
+What-if analysis tools
+Customizable reporting
+Phase 5: Optimization and Scale
+
+Performance optimization
+Enterprise-scale testing
+Advanced security features
+Documentation and knowledge base
+Technical Success Metrics
+Model Performance Metrics
+
+Prediction accuracy >90% for dependency risk scoring
+F1 score >0.85 for implicit dependency detection
+Physics compliance score >95% for differential equation models
+API response time <200ms for dashboard queries
+Integration Metrics
+
+Jira synchronization completeness >99.9%
+Real-time update latency <2 seconds
+Webhook processing throughput >100/second
+Authentication success rate >99.99%
+Business Value Metrics
+Project Management Improvements
+
+40% reduction in dependency-related delays
+50% improvement in delivery date predictability
+30% reduction in coordination meetings
+80% faster identification of critical blockers
+Strategic Value
+
+45% improved visibility into cross-portfolio dependencies
+35% better strategic-to-tactical alignment
+25% reduction in redundant work across teams
+50% more accurate resource forecasting
+Documentation Requirements
+User Guide
+
+Role-based documentation for different user types
+Video tutorials for common workflows
+Interactive help system with contextual assistance
+FAQ section with troubleshooting guidance
+Technical Documentation
+
+Architecture diagrams and component relationships
+API documentation for extensibility
+Model documentation with mathematical foundations
+Performance tuning guidelines
+Implementation Guide
+
+Deployment instructions for various environments
+Configuration options and best practices
+Security hardening recommendations
+Backup and disaster recovery procedures
+Final Notes
+This system should represent the cutting edge of project management technology by applying scientific computing principles to organizational dynamics. By treating dependencies and team behaviors as physical systems governed by mathematical laws, we can achieve unprecedented accuracy in project forecasting and risk management.
+
+The combination of Atlassian's powerful work management platform with the computational capabilities of Julia and Physics-Informed Neural Networks creates a solution that will transform how organizations manage complex projects and programs.
