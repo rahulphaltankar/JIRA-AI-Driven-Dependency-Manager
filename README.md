@@ -132,6 +132,3 @@ For questions, feedback, or support, please open an issue in the GitHub reposito
 
 ---
 
-<div align="center">
-<p>Built with ❤️ for the Agile community</p>
-</div>
