@@ -1,6 +1,6 @@
 import { users, type User, type InsertUser, dependencies, type Dependency, type InsertDependency, jiraConfigs, type JiraConfig, type InsertJiraConfig, optimizationRecommendations, type OptimizationRecommendation, type InsertOptimizationRecommendation, mlModels, type MlModel, type InsertMlModel, notifications, type Notification, type InsertNotification } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 // Interface definition for all storage operations
 export interface IStorage {
@@ -193,6 +193,56 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedModel;
   }
+  
+  // Notification operations
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(sql`${notifications.createdAt} DESC`);
+  }
+  
+  async getNotification(id: number): Promise<Notification | undefined> {
+    const [notification] = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.id, id));
+    return notification;
+  }
+  
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+    return newNotification;
+  }
+  
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    const [updatedNotification] = await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, id))
+      .returning();
+    return updatedNotification;
+  }
+  
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    const result = await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.userId, userId));
+    return !!result;
+  }
+  
+  async deleteNotification(id: number): Promise<boolean> {
+    const [deletedNotification] = await db
+      .delete(notifications)
+      .where(eq(notifications.id, id))
+      .returning();
+    return !!deletedNotification;
+  }
 }
 
 // For fallback when no database is available
@@ -202,11 +252,13 @@ export class MemStorage implements IStorage {
   private jiraConfig: JiraConfig | undefined;
   private recommendations = new Map<number, OptimizationRecommendation>();
   private mlModels = new Map<number, MlModel>();
+  private notifications = new Map<number, Notification>();
   
   private userCurrentId = 1;
   private dependencyCurrentId = 1;
   private recommendationCurrentId = 1;
   private mlModelCurrentId = 1;
+  private notificationCurrentId = 1;
 
   constructor() {
     this.initializeData();
@@ -302,6 +354,37 @@ export class MemStorage implements IStorage {
     ];
     
     sampleRecommendations.forEach(rec => this.createRecommendation(rec));
+    
+    // Create sample notifications
+    const sampleNotifications: InsertNotification[] = [
+      {
+        userId: 1,
+        title: "Critical Dependency Blocked",
+        content: "The dependency 'Authentication API Updates' has been marked as blocked. Immediate attention required.",
+        type: "dependency_change",
+        referenceId: 1,
+        referenceType: "dependency",
+        isRead: false
+      },
+      {
+        userId: 1,
+        title: "New Recommendation Available",
+        content: "A new optimization recommendation has been generated for 'Database Schema Migration' dependency.",
+        type: "recommendation",
+        referenceId: 2,
+        referenceType: "recommendation",
+        isRead: false
+      },
+      {
+        userId: 1,
+        title: "System Update Complete",
+        content: "The PINN model training has completed with 87% accuracy. Model is now ready for risk predictions.",
+        type: "system",
+        isRead: false
+      }
+    ];
+    
+    sampleNotifications.forEach(notif => this.createNotification(notif));
   }
 
   // User operations
@@ -458,6 +541,64 @@ export class MemStorage implements IStorage {
     };
     this.mlModels.set(id, updatedModel);
     return updatedModel;
+  }
+  
+  // Notification operations
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return Array.from(this.notifications.values())
+      .filter(notification => notification.userId === userId)
+      .sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+        return dateB - dateA; // Descending order (newest first)
+      });
+  }
+  
+  async getNotification(id: number): Promise<Notification | undefined> {
+    return this.notifications.get(id);
+  }
+  
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const id = this.notificationCurrentId++;
+    const newNotification: Notification = {
+      ...notification,
+      id,
+      createdAt: new Date()
+    };
+    this.notifications.set(id, newNotification);
+    return newNotification;
+  }
+  
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    const notification = this.notifications.get(id);
+    if (!notification) return undefined;
+    
+    const updatedNotification: Notification = {
+      ...notification,
+      isRead: true
+    };
+    this.notifications.set(id, updatedNotification);
+    return updatedNotification;
+  }
+  
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    let updated = false;
+    
+    Array.from(this.notifications.values())
+      .filter(notification => notification.userId === userId && !notification.isRead)
+      .forEach(notification => {
+        this.notifications.set(notification.id, {
+          ...notification,
+          isRead: true
+        });
+        updated = true;
+      });
+    
+    return updated;
+  }
+  
+  async deleteNotification(id: number): Promise<boolean> {
+    return this.notifications.delete(id);
   }
 }
 
