@@ -8,6 +8,8 @@ import Integrations from "@/pages/integrations";
 import MlConfig from "@/pages/ml-config";
 import PinnConfig from "@/pages/pinn-config";
 import UserGuide from "@/pages/user-guide";
+import SetupWizard from "@/pages/setup-wizard";
+import OneClickGuide from "@/pages/one-click-guide";
 import NotFound from "@/pages/not-found";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -15,7 +17,8 @@ function App() {
   return (
     <>
       <Switch>
-        <Route path="/" component={Dashboard} />
+        <Route path="/" component={OneClickGuide} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/dependencies" component={Dependencies} />
         <Route path="/analysis" component={Analysis} />
         <Route path="/optimization" component={Optimization} />
@@ -24,6 +27,8 @@ function App() {
         <Route path="/ml-config" component={MlConfig} />
         <Route path="/pinn-config" component={PinnConfig} />
         <Route path="/user-guide" component={UserGuide} />
+        <Route path="/setup" component={SetupWizard} />
+        <Route path="/app-entry" component={SetupWizard} />
         <Route component={NotFound} />
       </Switch>
       <Toaster />
