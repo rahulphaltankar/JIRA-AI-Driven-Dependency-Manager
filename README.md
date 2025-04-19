@@ -1,4 +1,4 @@
-# JIRA-AI Dependency Tracker
+# DependencyForecaster
 
 <div align="center">
 <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
@@ -7,11 +7,12 @@
 <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
 <img src="https://img.shields.io/badge/Julia-9558B2?style=for-the-badge&logo=julia&logoColor=white" alt="Julia">
 <img src="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white" alt="Jira">
+<img src="https://img.shields.io/badge/Atlassian-0052CC?style=for-the-badge&logo=atlassian&logoColor=white" alt="Atlassian">
 </div>
 
-## Revolutionary Dependency Management with Scientific Machine Learning
+## One-Click Dependency Prediction for Jira and Jira Align
 
-JIRA-AI Dependency Tracker is an enterprise-grade SaaS application that leverages advanced Scientific Machine Learning and Physics-Informed Neural Networks (PINNs) to revolutionize dependency management in Jira and Jira Align.
+DependencyForecaster is an enterprise-grade SaaS application that leverages advanced Scientific Machine Learning and Physics-Informed Neural Networks (PINNs) to predict and manage dependencies across your Jira and Jira Align ecosystem. Install directly from the Atlassian Marketplace and start forecasting dependencies 3-12 months in advance.
 
 ## 🚀 Features
 
@@ -37,9 +38,30 @@ JIRA-AI Dependency Tracker is an enterprise-grade SaaS application that leverage
 - **Scenario Analysis**: Run "what-if" scenarios to optimize dependency networks
 - **Predictive Analytics**: Forecast potential risks before they impact your program
 
+## 🔌 One-Click Atlassian Integration
+
+DependencyForecaster delivers a seamless integration experience:
+
+### Atlassian Marketplace App
+- **Instant Installation**: Install directly from the Atlassian Marketplace with a single click
+- **OAuth 2.0 Authentication**: Secure connection using Atlassian's authentication standards
+- **Multi-Tenant Architecture**: Support for enterprise organizations with multiple Jira instances
+- **Embedded App Experience**: Operates directly within your Jira and Jira Align interfaces
+
+### Setup Wizard
+- **Guided Configuration**: Step-by-step wizard walks you through initial setup in minutes
+- **Import Options**: Choose which projects, ARTs, and teams to include in dependency forecasting
+- **Template Selection**: Choose from dependency models tailored to your specific industry
+- **Role Configuration**: Configure permissions for different stakeholders in your organization
+
+### Real-Time Integration
+- **Bi-directional Sync**: Changes in Jira are immediately reflected in DependencyForecaster and vice versa
+- **Webhook Listeners**: Receive instant updates when dependencies are created or modified
+- **Bulk Import**: Quickly import thousands of dependencies from your existing Jira and Jira Align instances
+
 ## 🧪 The Science Behind It
 
-JIRA-AI Dependency Tracker is built on cutting-edge scientific principles:
+DependencyForecaster is built on cutting-edge scientific principles:
 
 ### Physics-Informed Neural Networks (PINNs)
 PINNs incorporate physical laws into neural networks, ensuring predictions adhere to scientific principles. In our application, we model dependencies as complex systems with:
@@ -60,27 +82,41 @@ UDEs combine differential equations with neural networks for hybrid modeling tha
 
 ## 💻 Technical Architecture
 
-JIRA-AI Dependency Tracker is built on a modern, scalable stack:
+DependencyForecaster is built on a modern, scalable stack designed for seamless Atlassian integration:
 
-- **Frontend**: React with TypeScript and Shadcn UI components
-- **Backend**: Node.js with Express
-- **Database**: PostgreSQL with Drizzle ORM
+- **Frontend**: React with TypeScript and Shadcn UI components for beautiful visualizations
+- **Backend**: Node.js with Express optimized for Atlassian Connect integration
+- **Database**: PostgreSQL with Drizzle ORM for multi-tenant data storage
 - **Scientific Computing**: Julia integration for advanced mathematical modeling
-- **Real-time Communication**: WebSockets for live updates
-- **Authentication**: Custom JWT implementation with role-based access control
+- **Real-time Communication**: WebSockets for live collaboration and updates
+- **Atlassian Authentication**: JWT-based Atlassian Connect authentication
+- **Multi-Tenant Architecture**: Full isolation between customer instances
+- **Webhook Integration**: Real-time event processing from Jira and Jira Align
+- **iFrame Embedding**: Seamless integration within the Atlassian product experience
 
 ## 🛠️ Installation
 
-### Prerequisites
+### Atlassian Marketplace (Recommended)
+The easiest way to install DependencyForecaster is directly from the Atlassian Marketplace:
+
+1. Search for "DependencyForecaster" in the Atlassian Marketplace
+2. Click "Get it now" to install the app to your Jira instance
+3. Complete the setup wizard to connect to your Jira Align instance
+4. Start forecasting dependencies immediately!
+
+### Self-Hosted Deployment
+For organizations with specific hosting requirements, you can deploy DependencyForecaster to your own infrastructure:
+
+#### Prerequisites
 - Node.js 16+
 - PostgreSQL 14+
 - Julia 1.8+ (for advanced scientific models)
 
-### Setup
+#### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/jira-pinn-dependency-tracker.git
-cd jira-pinn-dependency-tracker
+git clone https://github.com/yourusername/dependency-forecaster.git
+cd dependency-forecaster
 
 # Install dependencies
 npm install
