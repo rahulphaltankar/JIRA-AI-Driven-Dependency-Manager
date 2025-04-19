@@ -67,6 +67,17 @@ interface AtlassianIntegrationConfig {
 }
 
 class JiraClient {
+  private tenants: Map<string, {
+    jiraUrl: string;
+    jiraToken?: string;
+    jiraEmail?: string;
+    sharedSecret: string;
+    jiraAlignUrl?: string;
+    jiraAlignToken?: string;
+    webhookSecret?: string;
+  }> = new Map();
+  
+  // Legacy properties for backward compatibility
   private jiraUrl: string | null = null;
   private jiraEmail: string | null = null;
   private jiraToken: string | null = null;
@@ -84,6 +95,15 @@ class JiraClient {
   private webhookEnabled: boolean = false;
   private webhookUrl: string | null = null;
   private webhookServer: WebSocketServer | null = null;
+  
+  // Initialize a new tenant connection
+  public initializeTenant(clientKey: string, baseUrl: string, sharedSecret: string) {
+    this.tenants.set(clientKey, {
+      jiraUrl: baseUrl,
+      sharedSecret
+    });
+    console.log(`Initialized tenant: ${clientKey} with URL: ${baseUrl}`);
+  }
   
   constructor() {
     this.loadConfig();
@@ -243,6 +263,129 @@ class JiraClient {
         status: 'completed',
         description: `Issue ${issueKey} was deleted in Jira`
       });
+    }
+  }
+  
+  // Methods for link webhook events
+  async processIssueLinkCreateEvent(data: any) {
+    const sourceIssueKey = data.issueLink?.sourceIssueKey;
+    const targetIssueKey = data.issueLink?.targetIssueKey;
+    const linkType = data.issueLink?.type?.name;
+    
+    if (!sourceIssueKey || !targetIssueKey || !linkType) return;
+    
+    // Only process dependency-related links
+    if (!['blocks', 'depends on', 'is blocked by'].includes(linkType)) return;
+    
+    const sourceIssue = await this.getIssue(sourceIssueKey);
+    const targetIssue = await this.getIssue(targetIssueKey);
+    
+    // Create a new dependency
+    const dependency: InsertDependency = {
+      title: `${sourceIssue.fields.summary} → ${targetIssue.fields.summary}`,
+      sourceTeam: sourceIssue.fields.customfield_10010 || 'Unknown Team',
+      sourceArt: sourceIssue.fields.customfield_10011 || 'Unknown ART',
+      targetTeam: targetIssue.fields.customfield_10010 || 'Unknown Team',
+      targetArt: targetIssue.fields.customfield_10011 || 'Unknown ART',
+      dueDate: sourceIssue.fields.duedate ? new Date(sourceIssue.fields.duedate) : null,
+      status: this.mapJiraStatusToDependencyStatus(sourceIssue.fields.status.name),
+      riskScore: await this.calculateRiskScore(sourceIssue, targetIssue),
+      jiraId: sourceIssue.key,
+      description: `Dependency between ${sourceIssue.key} and ${targetIssue.key}: ${sourceIssue.fields.description || 'No description'}`,
+      isCrossArt: sourceIssue.fields.customfield_10011 !== targetIssue.fields.customfield_10011
+    };
+    
+    await storage.createDependency(dependency);
+  }
+  
+  async processIssueLinkDeleteEvent(data: any) {
+    const sourceIssueKey = data.issueLink?.sourceIssueKey;
+    const targetIssueKey = data.issueLink?.targetIssueKey;
+    
+    if (!sourceIssueKey || !targetIssueKey) return;
+    
+    // Find dependencies related to these issues
+    const dependencies = await storage.getDependencies();
+    const affectedDependencies = dependencies.filter(d => 
+      d.jiraId === sourceIssueKey && 
+      d.description?.includes(targetIssueKey)
+    );
+    
+    // Mark dependencies as resolved
+    for (const dependency of affectedDependencies) {
+      await storage.updateDependency(dependency.id, {
+        status: 'completed',
+        description: `Link between ${sourceIssueKey} and ${targetIssueKey} was removed in Jira`
+      });
+    }
+  }
+  
+  // Method for forecasting dependencies
+  async getForecastDependenciesForTenant(clientKey: string, months: number = 3): Promise<any> {
+    // Get tenant configuration
+    const tenant = this.tenants.get(clientKey);
+    if (!tenant) {
+      throw new Error(`Tenant ${clientKey} not found`);
+    }
+    
+    // Legacy fallback for development
+    const jiraUrlToUse = tenant.jiraUrl || this.jiraUrl;
+    const jiraTokenToUse = tenant.jiraToken || this.jiraToken;
+    const jiraEmailToUse = tenant.jiraEmail || this.jiraEmail;
+    
+    if (!jiraUrlToUse) {
+      throw new Error("No Jira URL configured for this tenant");
+    }
+    
+    // Save current context
+    const originalUrl = this.jiraUrl;
+    const originalToken = this.jiraToken;
+    const originalEmail = this.jiraEmail;
+    
+    try {
+      // Set context to the tenant
+      this.jiraUrl = jiraUrlToUse;
+      this.jiraToken = jiraTokenToUse;
+      this.jiraEmail = jiraEmailToUse;
+      
+      // Get existing dependencies
+      const currentDependencies = await this.importDependencies();
+      
+      // Generate forecasted dependencies using ML models
+      const pinnModelId = 1; // Use default PINN model
+      const mlModel = await storage.getMlModel(pinnModelId);
+      
+      if (!mlModel) {
+        throw new Error("No ML model found for dependency forecasting");
+      }
+      
+      // Use the model to forecast future dependencies
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + months);
+      
+      // The actual forecast would use Julia and PINN models
+      // For now, we're simulating forecast results
+      const forecast = currentDependencies.map(dependency => {
+        // Create a forecasted version of each dependency
+        return {
+          ...dependency,
+          forecastDate: endDate,
+          forecastedRiskScore: dependency.riskScore * (1 + (Math.random() * 0.5 - 0.25)),
+          confidenceLevel: 0.7 + Math.random() * 0.3,
+          forecastType: 'pinn-model'
+        };
+      });
+      
+      return {
+        forecast,
+        timeHorizon: `${months} months`,
+        generatedAt: new Date()
+      };
+    } finally {
+      // Restore original context
+      this.jiraUrl = originalUrl;
+      this.jiraToken = originalToken;
+      this.jiraEmail = originalEmail;
     }
   }
   

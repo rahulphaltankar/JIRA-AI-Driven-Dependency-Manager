@@ -338,3 +338,48 @@ export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 
 export type IntegrationConnection = typeof integrationConnections.$inferSelect;
 export type InsertIntegrationConnection = z.infer<typeof insertIntegrationConnectionSchema>;
+
+// Atlassian Connect multi-tenant support
+export const atlassianTenants = pgTable("atlassian_tenants", {
+  id: serial("id").primaryKey(),
+  clientKey: text("client_key").notNull().unique(),
+  sharedSecret: text("shared_secret").notNull(),
+  baseUrl: text("base_url").notNull(),
+  productType: text("product_type").notNull(), // 'jira', 'jira-align', etc.
+  settings: jsonb("settings"),
+  webhookSecret: text("webhook_secret"),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
+  scopes: text("scopes").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const tenantUsers = pgTable("tenant_users", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => atlassianTenants.id),
+  atlassianUserId: text("atlassian_user_id").notNull(),
+  email: text("email"),
+  displayName: text("display_name"),
+  role: text("role").default("user"),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAtlassianTenantSchema = createInsertSchema(atlassianTenants).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTenantUserSchema = createInsertSchema(tenantUsers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AtlassianTenant = typeof atlassianTenants.$inferSelect;
+export type InsertAtlassianTenant = z.infer<typeof insertAtlassianTenantSchema>;
+
+export type TenantUser = typeof tenantUsers.$inferSelect;
+export type InsertTenantUser = z.infer<typeof insertTenantUserSchema>;
