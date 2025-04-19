@@ -130,6 +130,7 @@ class JiraClient {
         this.oauthSecret = config.oauthSecret || null;
         this.webhookEnabled = config.webhookEnabled || false;
         this.webhookUrl = config.webhookUrl || null;
+        this.useDemoMode = config.useDemoMode || false;
       }
     } catch (error) {
       console.error("Error loading Jira configuration:", error);
@@ -391,6 +392,29 @@ class JiraClient {
   }
   
   private async makeJiraRequest({ method, url, body }: JiraApiOptions) {
+    // Check if we're in demo mode
+    if (this.useDemoMode) {
+      console.log('Demo mode: Simulating Jira API request:', { method, url });
+      
+      // Return mock data based on the requested endpoint
+      if (url === '/rest/api/3/myself') {
+        return { displayName: 'Demo User', emailAddress: 'demo@example.com', accountId: 'demo-user-id' };
+      } else if (url === '/rest/api/3/project') {
+        return [
+          { id: 'DEMO-1', key: 'DEMO', name: 'Demo Project' },
+          { id: 'FRONTEND-1', key: 'FRONT', name: 'Frontend Project' },
+          { id: 'BACKEND-1', key: 'BACK', name: 'Backend Project' }
+        ];
+      } else if (url === '/rest/api/3/search') {
+        // Return empty result for search to trigger the generateDemoData function
+        return { issues: [] };
+      }
+      
+      // Return a generic successful response for other endpoints
+      return { success: true };
+    }
+    
+    // Regular API request for non-demo mode
     if (!this.jiraUrl || !this.jiraEmail || !this.jiraToken) {
       throw new Error("Jira configuration is not set");
     }
@@ -432,6 +456,24 @@ class JiraClient {
   }
   
   private async makeJiraAlignRequest({ method, url, body }: JiraApiOptions) {
+    // Check if we're in demo mode
+    if (this.useDemoMode) {
+      console.log('Demo mode: Simulating Jira Align API request:', { method, url });
+      
+      // Return mock data based on the requested endpoint
+      if (url === '/api/team/list') {
+        return [
+          { id: 1, name: 'Alpha Team', members: 8, art: 'Frontend ART' },
+          { id: 2, name: 'Beta Team', members: 7, art: 'Backend ART' },
+          { id: 3, name: 'Gamma Team', members: 6, art: 'DevOps ART' }
+        ];
+      }
+      
+      // Return a generic successful response for other endpoints
+      return { success: true };
+    }
+    
+    // Regular API request for non-demo mode
     if (!this.jiraAlignUrl || !this.jiraAlignToken) {
       throw new Error("Jira Align configuration is not set");
     }

@@ -141,7 +141,8 @@ export default function SetupWizard() {
         jiraAlignUrl: existingConfig.jiraAlignUrl || "",
         jiraAlignToken: "", // Don't display the token for security
         webhookEnabled: existingConfig.webhookEnabled || true,
-        webhookUrl: existingConfig.webhookUrl || ""
+        webhookUrl: existingConfig.webhookUrl || "",
+        useDemoMode: existingConfig.useDemoMode || false
       }));
     }
   }, [existingConfig, isLoading]);
