@@ -471,6 +471,12 @@ class JiraClient {
   
   async testConnection(config: any) {
     try {
+      // Check if demo mode is enabled
+      if (config.useDemoMode) {
+        console.log('Demo mode enabled, skipping actual API connection');
+        return { success: true, message: 'Demo Mode activated successfully' };
+      }
+      
       // Save the config temporarily
       const originalUrl = this.jiraUrl;
       const originalEmail = this.jiraEmail;
@@ -562,10 +568,100 @@ class JiraClient {
     return issue.fields.issuelinks || [];
   }
   
+  async generateDemoData() {
+    // Generate sample ART names
+    const artNames = ['Security ART', 'Frontend ART', 'Backend ART', 'DevOps ART', 'Mobile ART'];
+    
+    // Generate sample team names
+    const teamNames = [
+      'Alpha Team', 'Beta Team', 'Gamma Team', 'Delta Team', 'Epsilon Team',
+      'Omega Team', 'Sigma Team', 'Zeta Team', 'Theta Team', 'Phi Team'
+    ];
+    
+    // Generate sample issue types
+    const issueTypes = ['Epic', 'Story', 'Task', 'Bug', 'Feature'];
+    
+    // Generate sample statuses
+    const statuses = ['In Progress', 'Ready for Review', 'Blocked', 'Done', 'To Do'];
+    
+    // Generate sample dependencies
+    const dependencies: InsertDependency[] = [];
+    
+    for (let i = 1; i <= 25; i++) {
+      // Randomly select source and target teams/ARTs
+      const sourceArt = artNames[Math.floor(Math.random() * artNames.length)];
+      const targetArt = Math.random() > 0.3 ? sourceArt : artNames[Math.floor(Math.random() * artNames.length)];
+      const sourceTeam = teamNames[Math.floor(Math.random() * teamNames.length)];
+      const targetTeam = Math.random() > 0.5 ? sourceTeam : teamNames[Math.floor(Math.random() * teamNames.length)];
+      
+      // Generate due date (random date in the next 90 days)
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 90));
+      
+      // Select issue type and status
+      const issueType = issueTypes[Math.floor(Math.random() * issueTypes.length)];
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      
+      // Calculate risk score (higher for cross-ART dependencies)
+      const isCrossArt = sourceArt !== targetArt;
+      let riskScore = Math.floor(Math.random() * 70) + 15; // Base between 15-85
+      
+      if (isCrossArt) {
+        riskScore += 15; // Add risk for cross-ART
+      }
+      
+      if (status === 'Blocked') {
+        riskScore += 20; // Add risk for blocked status
+      }
+      
+      // Cap at 100
+      riskScore = Math.min(100, riskScore);
+      
+      // Create dependency object
+      dependencies.push({
+        title: `DEMO-${i}: ${issueType} dependency between ${sourceTeam} and ${targetTeam}`,
+        sourceTeam,
+        sourceArt,
+        targetTeam,
+        targetArt,
+        dueDate,
+        status: this.mapJiraStatusToDependencyStatus(status),
+        riskScore,
+        jiraId: `DEMO-${i}`,
+        description: `This is a demo dependency between ${sourceTeam} (${sourceArt}) and ${targetTeam} (${targetArt})`,
+        isCrossArt
+      });
+    }
+    
+    return dependencies;
+  }
+
   async importDependencies() {
     await this.loadConfig();
     
     try {
+      // Check if we're in demo mode
+      const configs = await storage.getJiraConfig();
+      if (configs && configs.useDemoMode) {
+        console.log('Using demo mode for dependency import');
+        
+        // Generate and save demo dependencies
+        const demoDependencies = await this.generateDemoData();
+        let importedCount = 0;
+        
+        for (const dependency of demoDependencies) {
+          await storage.createDependency(dependency);
+          importedCount++;
+        }
+        
+        return { 
+          success: true, 
+          count: importedCount,
+          message: `Successfully imported ${importedCount} demo dependencies` 
+        };
+      }
+      
+      // Real Jira integration code
       // Get all dependencies by querying for issues with links
       const response = await this.makeJiraRequest({
         method: 'POST',

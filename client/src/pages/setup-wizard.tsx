@@ -27,7 +27,8 @@ export default function SetupWizard() {
     jiraAlignUrl: "",
     jiraAlignToken: "",
     webhookEnabled: true,
-    webhookUrl: ""
+    webhookUrl: "",
+    useDemoMode: false
   });
   
   const [dataOptions, setDataOptions] = useState({
@@ -325,6 +326,21 @@ export default function SetupWizard() {
                       />
                       <Label htmlFor="webhookEnabled">Enable real-time updates via webhooks</Label>
                     </div>
+
+                    <div className="mt-6 border-t pt-6">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="useDemoMode"
+                          name="useDemoMode"
+                          checked={jiraConfig.useDemoMode}
+                          onCheckedChange={(checked) => setJiraConfig({...jiraConfig, useDemoMode: !!checked})}
+                        />
+                        <Label htmlFor="useDemoMode" className="font-semibold text-primary">Use Demo Mode</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1 ml-6">
+                        Enable Demo Mode to explore the application with sample data without requiring actual Jira credentials.
+                      </p>
+                    </div>
                   </div>
                   
                   <div className="flex justify-between mt-6">
@@ -341,12 +357,14 @@ export default function SetupWizard() {
                         onClick={handleSaveJiraConfig}
                         disabled={
                           saveConfigMutation.isPending ||
-                          (!jiraConfig.jiraUrl) ||
-                          (!jiraConfig.useOAuth && (!jiraConfig.jiraEmail || !jiraConfig.jiraToken)) ||
-                          (jiraConfig.useOAuth && (!jiraConfig.oauthClientId || !jiraConfig.oauthSecret))
+                          (!jiraConfig.useDemoMode && (
+                            (!jiraConfig.jiraUrl) ||
+                            (!jiraConfig.useOAuth && (!jiraConfig.jiraEmail || !jiraConfig.jiraToken)) ||
+                            (jiraConfig.useOAuth && (!jiraConfig.oauthClientId || !jiraConfig.oauthSecret))
+                          ))
                         }
                       >
-                        {saveConfigMutation.isPending ? "Saving..." : "Next"}
+                        {saveConfigMutation.isPending ? "Saving..." : jiraConfig.useDemoMode ? "Continue with Demo Mode" : "Next"}
                       </Button>
                     </div>
                   </div>
