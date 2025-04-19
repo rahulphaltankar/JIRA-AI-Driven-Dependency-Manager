@@ -860,5 +860,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // One-click guide - Forecast data 
+  app.get('/api/forecast/dependencies', async (req, res) => {
+    try {
+      // Get forecast months from query param or default to 3
+      const months = parseInt(req.query.months as string) || 3;
+      
+      // Get dependencies forecast based on PINN models
+      const forecastData = await jiraClient.getForecastDependenciesForTenant('default', months);
+      
+      res.json(forecastData);
+    } catch (error) {
+      console.error('Error fetching dependency forecast:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error fetching dependency forecast' 
+      });
+    }
+  });
+
   return httpServer;
 }

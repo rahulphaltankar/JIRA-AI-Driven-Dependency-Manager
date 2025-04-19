@@ -48,16 +48,25 @@ DependencyForecaster delivers a seamless integration experience:
 - **Multi-Tenant Architecture**: Support for enterprise organizations with multiple Jira instances
 - **Embedded App Experience**: Operates directly within your Jira and Jira Align interfaces
 
-### Setup Wizard
+### Easy 5-Minute Setup Process
+1. **Install the App**: Click "Get it now" in the Atlassian Marketplace
+2. **Launch Setup Wizard**: The app automatically launches a guided setup wizard
+3. **Connect Your Instance**: Enter your Jira URL and authentication details (or use OAuth)
+4. **Configure Forecasting**: Select your forecast horizon (3-12 months) and dependency types
+5. **Import Initial Data**: The system automatically imports your existing dependencies
+6. **Start Forecasting**: View your first dependency predictions immediately
+
+### Setup Wizard Features
 - **Guided Configuration**: Step-by-step wizard walks you through initial setup in minutes
 - **Import Options**: Choose which projects, ARTs, and teams to include in dependency forecasting
-- **Template Selection**: Choose from dependency models tailored to your specific industry
+- **PINN Model Selection**: Configure Physics-Informed Neural Networks to match your organization's needs
 - **Role Configuration**: Configure permissions for different stakeholders in your organization
 
 ### Real-Time Integration
 - **Bi-directional Sync**: Changes in Jira are immediately reflected in DependencyForecaster and vice versa
 - **Webhook Listeners**: Receive instant updates when dependencies are created or modified
 - **Bulk Import**: Quickly import thousands of dependencies from your existing Jira and Jira Align instances
+- **Cross-ART Visibility**: Automatically detect dependencies that cross Agile Release Train boundaries
 
 ## 🧪 The Science Behind It
 
@@ -111,26 +120,53 @@ For organizations with specific hosting requirements, you can deploy DependencyF
 - Node.js 16+
 - PostgreSQL 14+
 - Julia 1.8+ (for advanced scientific models)
+- Jira and/or Jira Align instance with admin access
 
-#### Setup
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/dependency-forecaster.git
-cd dependency-forecaster
+#### Setup Process
+1. **Prepare Your Environment**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/yourusername/dependency-forecaster.git
+   cd dependency-forecaster
 
-# Install dependencies
-npm install
+   # Install dependencies
+   npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your database and API credentials
+   # Set up environment variables
+   cp .env.example .env
+   # Edit .env with your database and API credentials
+   ```
 
-# Run database migrations
-npm run db:push
+2. **Configure Database**
+   ```bash
+   # Run database migrations
+   npm run db:push
+   ```
 
-# Start the development server
-npm run dev
-```
+3. **Set Up Atlassian Connect App**
+   - Configure the `atlassian-connect.json` file with your app's base URL
+   - Add the necessary scopes for Jira and Jira Align APIs
+   - Register your app with your Atlassian instance
+
+4. **Deploy the Application**
+   ```bash
+   # For development
+   npm run dev
+   
+   # For production
+   npm run build
+   npm start
+   ```
+
+5. **Install in Jira**
+   - Navigate to Manage Apps in your Jira instance
+   - Upload or point to your deployed app
+   - Follow the on-screen prompts to complete installation
+
+6. **Complete Setup Wizard**
+   - The app will automatically launch the setup wizard
+   - Follow the steps to connect your Jira and Jira Align instances
+   - Configure your PINN models and dependency types
 
 ## 📖 Documentation
 
