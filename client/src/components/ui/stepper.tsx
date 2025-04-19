@@ -60,31 +60,35 @@ export function Step({
   last,
   orientation = "horizontal",
 }: StepProps) {
+  const isActive = !!active;
+  const isCompleted = !!completed;
+  const isLast = !!last;
+
   return (
     <div
       className={cn(
         "flex",
         orientation === "vertical" ? "flex-col" : "flex-row items-center",
-        !last && orientation === "horizontal" && "flex-1",
+        !isLast && orientation === "horizontal" && "flex-1",
         className
       )}
     >
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child as React.ReactElement<any>, {
-            active,
-            completed,
+            active: isActive,
+            completed: isCompleted,
             orientation,
           });
         }
         return child;
       })}
       
-      {!last && orientation === "horizontal" && (
+      {!isLast && orientation === "horizontal" && (
         <div
           className={cn(
             "h-[1px] w-full bg-border mx-2",
-            completed && "bg-primary"
+            isCompleted && "bg-primary"
           )}
         />
       )}
@@ -107,6 +111,9 @@ export function StepLabel({
   completed,
   orientation = "horizontal",
 }: StepLabelProps) {
+  const isActive = !!active;
+  const isCompleted = !!completed;
+  
   return (
     <div
       className={cn(
@@ -115,12 +122,12 @@ export function StepLabel({
         className
       )}
     >
-      <StepIcon active={active} completed={completed} />
+      <StepIcon active={isActive} completed={isCompleted} />
       <span
         className={cn(
           "ml-2 text-sm font-medium",
-          active ? "text-primary" : "text-muted-foreground",
-          completed && "text-primary"
+          isActive ? "text-primary" : "text-muted-foreground",
+          isCompleted && "text-primary"
         )}
       >
         {children}
@@ -142,11 +149,13 @@ export function StepContent({
   active,
   orientation = "vertical",
 }: StepContentProps) {
+  const isActive = !!active;
+  
   if (orientation === "horizontal") {
     return null;
   }
 
-  return active ? (
+  return isActive ? (
     <div
       className={cn(
         "ml-8 border-l pl-8 pb-8 border-border",

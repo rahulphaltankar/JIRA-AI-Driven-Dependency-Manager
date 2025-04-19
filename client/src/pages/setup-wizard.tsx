@@ -129,8 +129,8 @@ export default function SetupWizard() {
   // Effect to load existing config
   useEffect(() => {
     if (existingConfig && !isLoading) {
-      setJiraConfig({
-        ...jiraConfig,
+      setJiraConfig(prevConfig => ({
+        ...prevConfig,
         jiraUrl: existingConfig.jiraUrl || "",
         jiraEmail: existingConfig.jiraEmail || "",
         jiraToken: "", // Don't display the token for security
@@ -141,9 +141,9 @@ export default function SetupWizard() {
         jiraAlignToken: "", // Don't display the token for security
         webhookEnabled: existingConfig.webhookEnabled || true,
         webhookUrl: existingConfig.webhookUrl || ""
-      });
+      }));
     }
-  }, [existingConfig, isLoading, jiraConfig]);
+  }, [existingConfig, isLoading]);
   
   // Handle input changes
   const handleJiraConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
