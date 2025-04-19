@@ -1,0 +1,84 @@
+{
+  "key": "dependency-forecaster",
+  "name": "DependencyForecaster",
+  "description": "AI-powered dependency prediction and management for Jira and Jira Align",
+  "vendor": {
+    "name": "DependencyForecaster",
+    "url": "https://dependencyforecaster.com"
+  },
+  "baseUrl": "{{baseUrl}}",
+  "links": {
+    "self": "{{baseUrl}}/atlassian-connect.json",
+    "homepage": "{{baseUrl}}"
+  },
+  "authentication": {
+    "type": "jwt"
+  },
+  "lifecycle": {
+    "installed": "/api/atlassian/installed",
+    "uninstalled": "/api/atlassian/uninstalled"
+  },
+  "scopes": [
+    "read",
+    "write",
+    "delete",
+    "act_as_user"
+  ],
+  "apiVersion": 1,
+  "modules": {
+    "generalPages": [
+      {
+        "key": "dependency-dashboard",
+        "location": "jira-menu",
+        "name": {
+          "value": "DependencyForecaster"
+        },
+        "url": "/app-entry",
+        "conditions": [
+          {
+            "condition": "user_is_logged_in"
+          }
+        ]
+      }
+    ],
+    "webPanels": [
+      {
+        "key": "issue-dependency-panel",
+        "name": {
+          "value": "Dependencies"
+        },
+        "location": "atl.jira.view.issue.right.context",
+        "url": "/panels/issue-dependency?issueKey={issue.key}"
+      }
+    ],
+    "webhooks": [
+      {
+        "event": "jira:issue_created",
+        "url": "/api/webhooks/issue-created"
+      },
+      {
+        "event": "jira:issue_updated",
+        "url": "/api/webhooks/issue-updated"
+      },
+      {
+        "event": "jira:issue_deleted",
+        "url": "/api/webhooks/issue-deleted"
+      },
+      {
+        "event": "jira:issue_link_created",
+        "url": "/api/webhooks/link-created"
+      },
+      {
+        "event": "jira:issue_link_deleted",
+        "url": "/api/webhooks/link-deleted"
+      }
+    ],
+    "postInstallPage": {
+      "key": "setup-wizard",
+      "name": {
+        "value": "Setup Wizard"
+      },
+      "url": "/setup"
+    }
+  }
+}
