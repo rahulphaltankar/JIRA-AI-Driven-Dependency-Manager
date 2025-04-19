@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function SetupWizard() {
   const [activeStep, setActiveStep] = useState(0);
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   
   // Form states
   const [jiraConfig, setJiraConfig] = useState({
@@ -127,7 +127,7 @@ export default function SetupWizard() {
   });
   
   // Effect to load existing config
-  React.useEffect(() => {
+  useEffect(() => {
     if (existingConfig && !isLoading) {
       setJiraConfig({
         ...jiraConfig,
@@ -143,7 +143,7 @@ export default function SetupWizard() {
         webhookUrl: existingConfig.webhookUrl || ""
       });
     }
-  }, [existingConfig, isLoading]);
+  }, [existingConfig, isLoading, jiraConfig]);
   
   // Handle input changes
   const handleJiraConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +196,7 @@ export default function SetupWizard() {
       title: "Setup complete",
       description: "Your DependencyForecaster has been set up successfully!",
     });
-    navigate("/dashboard");
+    setLocation("/dashboard");
   };
   
   return (
