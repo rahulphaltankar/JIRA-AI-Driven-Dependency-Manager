@@ -105,7 +105,7 @@ DependencyForecaster is built on a modern, scalable stack designed for seamless 
 
 ## 🛠️ Installation
 
-### Atlassian Marketplace (Recommended)
+### Atlassian Marketplace (Not yet listed, but Recommended)
 The easiest way to install DependencyForecaster is directly from the Atlassian Marketplace:
 
 1. Search for "DependencyForecaster" in the Atlassian Marketplace
