@@ -1,48 +1,15 @@
-import * as React from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { CheckIcon } from "lucide-react";
 
 interface StepperProps {
   activeStep: number;
   orientation?: "horizontal" | "vertical";
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-export function Stepper({
-  activeStep,
-  orientation = "horizontal",
-  children,
-  className,
-}: StepperProps) {
-  const steps = React.Children.toArray(children);
-  
-  return (
-    <div
-      className={cn(
-        "flex",
-        orientation === "vertical" ? "flex-col" : "flex-row",
-        className
-      )}
-    >
-      {React.Children.map(children, (child, index) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
-            index,
-            active: activeStep === index,
-            completed: activeStep > index,
-            last: index === steps.length - 1,
-            orientation,
-          });
-        }
-        return child;
-      })}
-    </div>
-  );
-}
-
 interface StepProps {
-  children: React.ReactNode;
+  children: ReactNode;
   completed?: boolean;
   className?: string;
   active?: boolean;
@@ -51,44 +18,125 @@ interface StepProps {
   orientation?: "horizontal" | "vertical";
 }
 
+interface StepLabelProps {
+  children: ReactNode;
+  className?: string;
+  active?: boolean;
+  completed?: boolean;
+  orientation?: "horizontal" | "vertical";
+}
+
+interface StepContentProps {
+  children: ReactNode;
+  className?: string;
+  active?: boolean;
+  orientation?: "horizontal" | "vertical";
+}
+
+interface StepIconProps {
+  active?: boolean;
+  completed?: boolean;
+}
+
+export function Stepper({
+  activeStep,
+  orientation = "horizontal",
+  children,
+  className,
+}: StepperProps) {
+  const [steps, setSteps] = useState<React.ReactElement[]>([]);
+
+  useEffect(() => {
+    const filteredSteps = React.Children.toArray(children).filter(
+      (step) => React.isValidElement(step) && step.type === Step
+    ) as React.ReactElement[];
+
+    const updatedSteps = filteredSteps.map((step, index) => {
+      return React.cloneElement(step, {
+        index,
+        active: index === activeStep,
+        completed: index < activeStep,
+        last: index === filteredSteps.length - 1,
+        orientation,
+      });
+    });
+
+    setSteps(updatedSteps);
+  }, [children, activeStep, orientation]);
+
+  return (
+    <div
+      className={cn(
+        orientation === "vertical" 
+          ? "flex flex-col space-y-1" 
+          : "flex items-center",
+        className
+      )}
+    >
+      {steps}
+    </div>
+  );
+}
+
 export function Step({
   children,
+  active,
   completed,
   className,
-  active,
   index,
   last,
   orientation = "horizontal",
 }: StepProps) {
-  const isActive = !!active;
-  const isCompleted = !!completed;
-  const isLast = !!last;
+  const childrenArray = React.Children.toArray(children);
+
+  const stepLabel = childrenArray.find(
+    (child) => React.isValidElement(child) && child.type === StepLabel
+  );
+
+  const stepContent = childrenArray.find(
+    (child) => React.isValidElement(child) && child.type === StepContent
+  );
 
   return (
     <div
       className={cn(
         "flex",
-        orientation === "vertical" ? "flex-col" : "flex-row items-center",
-        !isLast && orientation === "horizontal" && "flex-1",
+        orientation === "vertical" ? "flex-col" : "items-center",
         className
       )}
     >
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
-            active: isActive,
-            completed: isCompleted,
+      <div className={cn(
+        "flex",
+        orientation === "vertical" ? "items-start" : "flex-col items-center"
+      )}>
+        {React.isValidElement(stepLabel) &&
+          React.cloneElement(stepLabel, {
+            active,
+            completed,
             orientation,
-          });
-        }
-        return child;
-      })}
-      
-      {!isLast && orientation === "horizontal" && (
+          })}
+        
+        {!last && orientation === "horizontal" && (
+          <div
+            className={cn(
+              "w-20 h-[1px] mx-2",
+              completed ? "bg-primary" : "bg-border"
+            )}
+          />
+        )}
+      </div>
+
+      {React.isValidElement(stepContent) &&
+        React.cloneElement(stepContent, {
+          active,
+          orientation,
+        })}
+
+      {!last && orientation === "vertical" && (
         <div
           className={cn(
-            "h-[1px] w-full bg-border mx-2",
-            isCompleted && "bg-primary"
+            "w-[1px] h-10 ml-4 my-1",
+            completed ? "bg-primary" : "bg-border"
           )}
         />
       )}
@@ -96,102 +144,90 @@ export function Step({
   );
 }
 
-interface StepLabelProps {
-  children: React.ReactNode;
-  className?: string;
-  active?: boolean;
-  completed?: boolean;
-  orientation?: "horizontal" | "vertical";
-}
-
 export function StepLabel({
   children,
-  className,
   active,
   completed,
+  className,
   orientation = "horizontal",
 }: StepLabelProps) {
-  const isActive = !!active;
-  const isCompleted = !!completed;
-  
   return (
     <div
       className={cn(
         "flex items-center",
-        orientation === "vertical" && "mb-2",
+        orientation === "vertical" ? "mb-2" : "flex-col",
         className
       )}
     >
-      <StepIcon active={isActive} completed={isCompleted} />
-      <span
-        className={cn(
-          "ml-2 text-sm font-medium",
-          isActive ? "text-primary" : "text-muted-foreground",
-          isCompleted && "text-primary"
-        )}
-      >
-        {children}
-      </span>
+      <div className="flex items-center">
+        <StepIcon active={active} completed={completed} />
+        <span
+          className={cn(
+            "text-sm font-medium ml-2",
+            active ? "text-primary" : completed ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          {children}
+        </span>
+      </div>
     </div>
   );
 }
 
-interface StepContentProps {
-  children: React.ReactNode;
-  className?: string;
-  active?: boolean;
-  orientation?: "horizontal" | "vertical";
-}
-
 export function StepContent({
   children,
-  className,
   active,
-  orientation = "vertical",
+  className,
+  orientation = "horizontal",
 }: StepContentProps) {
-  const isActive = !!active;
-  
-  if (orientation === "horizontal") {
-    return null;
-  }
+  if (!active) return null;
 
-  return isActive ? (
+  return (
     <div
       className={cn(
-        "ml-8 border-l pl-8 pb-8 border-border",
+        orientation === "vertical" ? "ml-4 pl-4 border-l border-border" : "mt-4",
         className
       )}
     >
       {children}
     </div>
-  ) : null;
+  );
 }
 
-export function StepIcon({
-  active,
-  completed,
-}: {
-  active?: boolean;
-  completed?: boolean;
-}) {
-  const isActive = !!active;
-  const isCompleted = !!completed;
-  
+export function StepIcon({ active, completed }: StepIconProps) {
+  if (completed) {
+    return (
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center border-2",
-        isActive
-          ? "border-primary bg-primary/10"
-          : isCompleted
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-muted-foreground bg-background text-muted-foreground"
+        "flex items-center justify-center w-8 h-8 rounded-full border-2",
+        active
+          ? "border-primary bg-primary/10 text-primary"
+          : "border-muted-foreground/30 text-muted-foreground"
       )}
     >
-      {isCompleted ? (
-        <CheckIcon className="h-5 w-5" />
+      {active ? (
+        <div className="w-2 h-2 rounded-full bg-primary" />
       ) : (
-        <span className="text-sm font-medium">{isCompleted ? "✓" : ""}</span>
+        <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
       )}
     </div>
   );
