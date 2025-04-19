@@ -394,7 +394,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const maskedConfig = {
           ...config,
           jiraToken: config.jiraToken ? '•••••••••••' : '',
-          jiraAlignToken: config.jiraAlignToken ? '•••••••••••' : ''
+          jiraAlignToken: config.jiraAlignToken ? '•••••••••••' : '',
+          useDemoMode: config.useDemoMode || false
         };
         
         res.json(maskedConfig);

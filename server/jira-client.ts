@@ -95,6 +95,7 @@ class JiraClient {
   private webhookEnabled: boolean = false;
   private webhookUrl: string | null = null;
   private webhookServer: WebSocketServer | null = null;
+  private useDemoMode: boolean = false;
   
   // Initialize a new tenant connection
   public initializeTenant(clientKey: string, baseUrl: string, sharedSecret: string) {

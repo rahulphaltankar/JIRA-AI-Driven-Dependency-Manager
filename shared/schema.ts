@@ -31,6 +31,7 @@ export const jiraConfigs = pgTable("jira_configs", {
   trelloToken: text("trello_token"),
   webhookEnabled: boolean("webhook_enabled").default(false),
   webhookUrl: text("webhook_url"),
+  useDemoMode: boolean("use_demo_mode").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
